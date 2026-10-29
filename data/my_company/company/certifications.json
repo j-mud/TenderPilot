@@ -1,1 +1,14 @@
-
+{
+  "_note": "TODO: replace with real certificates. 'keyword' is a short word that appears in tender requirements for this certificate (used to catch expiring certificates). Dates as YYYY-MM-DD.",
+  "certifications": [
+    {"name": "Commercial Registration (CR)", "keyword": "commercial registration", "id": "TODO", "valid_until": "2099-01-01"},
+    {"name": "ZATCA Zakat certificate", "keyword": "zakat", "id": "TODO", "valid_until": "2099-01-01"},
+    {"name": "VAT registration certificate", "keyword": "vat", "id": "TODO", "valid_until": "2099-01-01"},
+    {"name": "GOSI compliance certificate", "keyword": "gosi", "id": "TODO", "valid_until": "2099-01-01"},
+    {"name": "Saudization (Nitaqat) certificate", "keyword": "nitaqat", "id": "TODO", "valid_until": "2099-01-01"},
+    {"name": "Chamber of Commerce membership", "keyword": "chamber of commerce", "id": "TODO", "valid_until": "2099-01-01"}
+  ],
+  "not_held": [
+    "TODO: list certifications and classifications the company does NOT have, e.g. CMMI, contractor classification"
+  ]
+}
