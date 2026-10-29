@@ -1,0 +1,73 @@
+{
+  "_how_scoring_works": "For each tender, eval.py checks: (1) the bid decision, (2) whether each key requirement was extracted (any keyword matches a requirement's text), (3) whether each planted trap was flagged as a gap/blocker (any keyword matches a gap or blocker).",
+  "tenders": {
+    "T101_citizen_ai_assistant": {
+      "expected_decision": "BID",
+      "key_requirements": [
+        {"name": "Commercial Registration", "keywords": ["commercial registration", "CR"]},
+        {"name": "Zakat certificate", "keywords": ["zakat"]},
+        {"name": "GOSI certificate", "keywords": ["gosi", "social insurance"]},
+        {"name": "Nitaqat certificate", "keywords": ["nitaqat", "saudization"]},
+        {"name": "ISO 27001", "keywords": ["27001"]},
+        {"name": "Local content 40%", "keywords": ["local content"]},
+        {"name": "Two conversational AI projects > SAR 2M", "keywords": ["conversational", "two (2)", "two projects", "2 projects"]},
+        {"name": "In-Kingdom hosting", "keywords": ["inside the kingdom", "in-kingdom", "hosted inside", "data residency", "within the kingdom", "in the kingdom", "saudi arabia"]},
+        {"name": "NCA ECC", "keywords": ["nca", "ecc", "essential cybersecurity"]},
+        {"name": "PDPL", "keywords": ["pdpl", "personal data"]},
+        {"name": "PMP project manager", "keywords": ["pmp", "project manager"]},
+        {"name": "Najdi and Hijazi dialects", "keywords": ["najdi", "hijazi", "dialect"]}
+      ],
+      "traps": []
+    },
+    "T102_smart_city_platform": {
+      "expected_decision": "NO_BID",
+      "key_requirements": [
+        {"name": "ISO 27001", "keywords": ["27001"]},
+        {"name": "Local content 35%", "keywords": ["local content"]},
+        {"name": "Government data platform project", "keywords": ["data platform", "dashboard"]},
+        {"name": "CMMI Level 3 (Appendix B)", "keywords": ["cmmi"]},
+        {"name": "IoT sensor installation (Appendix B)", "keywords": ["iot", "sensor"]}
+      ],
+      "traps": [
+        {"name": "Mandatory CMMI Level 3 hidden in Appendix B", "keywords": ["cmmi"]}
+      ]
+    },
+    "T103_radiology_ai": {
+      "expected_decision": "NO_BID",
+      "key_requirements": [
+        {"name": "SFDA MDMA", "keywords": ["sfda", "mdma", "medical device marketing"]},
+        {"name": "ISO 13485", "keywords": ["13485"]},
+        {"name": "10 years healthcare IT", "keywords": ["ten (10)", "10 years", "ten years", "healthcare it"]},
+        {"name": "DICOM / HL7 integration", "keywords": ["dicom", "hl7", "fhir", "pacs"]}
+      ],
+      "traps": [
+        {"name": "No SFDA authorization", "keywords": ["sfda", "mdma", "medical device"]},
+        {"name": "Only 7 of 10 required years", "keywords": ["10 years", "ten years", "ten (10)", "years of experience", "7 years", "healthcare it"]}
+      ]
+    },
+    "T104_archive_digitization_ar": {
+      "expected_decision": "CONDITIONAL_BID",
+      "key_requirements": [
+        {"name": "Zakat valid on submission date", "keywords": ["zakat", "الزكاة"]},
+        {"name": "Digitization project >= 1M pages", "keywords": ["million pages", "1,000,000", "1 million", "مليون صفحة", "digitization project", "digitisation project"]},
+        {"name": "Arabic OCR accuracy >= 95%", "keywords": ["95%", "accuracy", "دقة"]},
+        {"name": "In-Kingdom hosting", "keywords": ["inside the kingdom", "in-kingdom", "within the kingdom", "in the kingdom", "داخل المملكة", "saudi arabia"]},
+        {"name": "Local content 30%", "keywords": ["local content", "محتوى محلي"]},
+        {"name": "Bid bond 2%", "keywords": ["bid bond", "bank guarantee", "الضمان", "ضمان"]}
+      ],
+      "traps": [
+        {"name": "Zakat certificate expires 2026-12-05, before the 2026-12-10 deadline", "keywords": ["zakat", "الزكاة"]}
+      ]
+    },
+    "T105_school_construction": {
+      "expected_decision": "NO_BID",
+      "key_requirements": [
+        {"name": "Contractor classification Grade 3", "keywords": ["classification", "grade 3", "contractor"]},
+        {"name": "Three school/public building projects", "keywords": ["school", "public-building", "public building"]}
+      ],
+      "traps": [
+        {"name": "No construction contractor classification", "keywords": ["classification", "construction", "contractor"]}
+      ]
+    }
+  }
+}
