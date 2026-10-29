@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# TenderPilot: purchased tender documents and generated run output stay local
+data/my_company/tenders/*
+!data/my_company/tenders/placeholder.txt
+output/*
+!output/placeholder.txt
