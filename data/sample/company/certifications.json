@@ -1,1 +1,21 @@
-
+{
+  "_note": "Fictional certificates for demo purposes only. 'keyword' is used by the agent's guardrail to match certificates to tender requirements.",
+  "certifications": [
+    {"name": "Commercial Registration (CR)", "keyword": "commercial registration", "id": "CR-1010-XXXXXX", "valid_until": "2027-08-14"},
+    {"name": "Zakat, Tax and Customs Authority (ZATCA) Zakat certificate", "keyword": "zakat", "id": "ZATCA-ZK-55821", "valid_until": "2026-12-05"},
+    {"name": "VAT registration certificate", "keyword": "vat", "id": "VAT-3000XXXXXX0003", "valid_until": "2028-01-01"},
+    {"name": "GOSI (social insurance) compliance certificate", "keyword": "gosi", "id": "GOSI-778812", "valid_until": "2027-01-31"},
+    {"name": "Saudization (Nitaqat) certificate", "keyword": "nitaqat", "id": "NTQ-PLAT-2026", "valid_until": "2027-03-01"},
+    {"name": "Chamber of Commerce membership", "keyword": "chamber of commerce", "id": "RCC-445120", "valid_until": "2027-02-28"},
+    {"name": "ISO/IEC 27001:2022 Information Security Management", "keyword": "27001", "id": "ISO27001-FA-2024", "valid_until": "2027-05-30"},
+    {"name": "ISO 9001:2015 Quality Management", "keyword": "9001", "id": "ISO9001-FA-2023", "valid_until": "2026-12-31"},
+    {"name": "Local Content certificate (LCGPA)", "keyword": "local content", "id": "LC-52-2026", "score_percent": 52, "valid_until": "2027-06-30"},
+    {"name": "NCA Essential Cybersecurity Controls (ECC) compliance report", "keyword": "essential cybersecurity", "id": "ECC-2026-03", "valid_until": "2027-03-31"}
+  ],
+  "not_held": [
+    "CMMI (any level)",
+    "SFDA Medical Device Marketing Authorization (MDMA)",
+    "Contractor classification for construction works (any grade)",
+    "ISO 13485 (medical devices)"
+  ]
+}
