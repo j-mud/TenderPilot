@@ -216,17 +216,23 @@ if results["human_questions"]:
 
 # ---------------------------------------------------------------- per tender
 st.subheader("Tender details")
-tabs = st.tabs([r["tender_id"] for r in results["ranking"]] + ["Audit log"])
+prefixes = [r["tender_id"].split("_")[0] for r in results["ranking"]]
+tab_ids = [p if prefixes.count(p) == 1 else r["tender_id"] for p, r in zip(prefixes, results["ranking"])]  # "T101"
+tabs = st.tabs([f"{t} · {DECISION_LABEL[r['decision']]}" for t, r in zip(tab_ids, results["ranking"])] + ["Audit log"])
 for tab, r in zip(tabs, results["ranking"]):
     tid = r["tender_id"]
     e, q = exts[tid], quals[tid]
     with tab:
         st.markdown(f"### {english_part(e['title'])}")
-        if english_part(e["title"]) != e["title"] and arabic_part(e["title"]):  # bilingual: Arabic on its own RTL line
-            st.markdown(f'<div dir="rtl" style="font-size:1.25rem;margin:-0.5rem 0 0.5rem">{html.escape(arabic_part(e["title"]))}</div>',
-                        unsafe_allow_html=True)
+        # bilingual title/issuer: the Arabic goes on its own right-to-left lines instead of mixing into the English
+        ar_title = arabic_part(e["title"]) if english_part(e["title"]) != e["title"] else ""
+        ar_issuer = arabic_part(e["issuer"]) if english_part(e["issuer"]) != e["issuer"] else ""
+        if ar_title or ar_issuer:
+            st.markdown(f'<div dir="rtl" style="margin:-0.5rem 0 0.5rem"><div style="font-size:1.25rem">{html.escape(ar_title)}</div>'
+                        f'<div style="opacity:0.7">{html.escape(ar_issuer)}</div></div>', unsafe_allow_html=True)
         value = f" · value **SAR {e['estimated_value_sar']:,.0f}**" if e.get("estimated_value_sar") else ""
-        st.markdown(f"*{e['issuer']}* · deadline **{e['deadline']}**{value} · {DECISION_LABEL[q['decision']]} (fit {q['fit_score']})")
+        st.markdown(f"*{english_part(e['issuer'])}* · deadline **{e['deadline']}**{value} · "
+                    f"{DECISION_LABEL[q['decision']]} (fit {q['fit_score']})")
         st.write(e["summary"])
         left, right = st.columns(2)
         left.markdown("**Why**\n" + "\n".join(f"- {x}" for x in q["reasons"]))
