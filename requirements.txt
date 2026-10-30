@@ -8,6 +8,7 @@ python-docx>=1.1
 python-dotenv>=1.0
 streamlit>=1.50
 pandas>=2.2
+watchdog>=4.0  # faster Streamlit reloads
 # Optional, for scanned Arabic PDFs (also needs the Tesseract app with the 'ara' language pack):
 # pytesseract>=0.3.10
 # pillow>=10

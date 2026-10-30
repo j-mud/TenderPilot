@@ -1,0 +1,7 @@
+# Only reachable from this machine; open http://localhost:8501 yourself (no auto-opened browser tab).
+[server]
+address = "localhost"
+headless = true
+
+[browser]
+gatherUsageStats = false
