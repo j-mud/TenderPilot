@@ -4,6 +4,7 @@ run_agent():    the LLM is the orchestrator. It sees the goal and the tools and
                 decides what to call next (this is the autonomous mode to demo).
 run_pipeline(): the same tools in a fixed order. Use it as a reliable fallback.
 run_single():   one uploaded tender pack: extract, qualify, then draft + verify if worth bidding.
+resolve_answer(): the bid manager answered a question: re-qualify, and draft if it became a BID.
 """
 from __future__ import annotations
 
@@ -178,5 +179,26 @@ def run_single(pilot: TenderPilot, tender_id: str, max_revisions: int = 2) -> st
     msg = (f"{tender_id}: {q.decision} (fit {q.fit_score}). Draft r{pilot.drafts[tender_id].revision} "
            f"{'passed' if report and report.passed else 'has open issues'}; "
            f"{len(pilot.human_questions)} questions for the bid manager.")
+    pilot.on_event("finish", msg)
+    return msg
+
+
+def resolve_answer(pilot: TenderPilot, index: int, answer: str, max_revisions: int = 2) -> str:
+    """The bid manager answered question #index: record it, re-qualify that tender, and if it has
+    just become a BID, draft and verify its proposal."""
+    tid = pilot.human_questions[index]["tender_id"]
+    before = pilot.qualifications[tid].decision
+    pilot.on_event("plan", f"Answer received for {tid}: re-qualifying with it")
+    pilot.answer_question(index, answer)
+    q = pilot.qualify_tender(tid)
+    if q.decision == "BID" and before != "BID":
+        _draft_and_verify(pilot, tid, max_revisions)
+        report = pilot.verifications.get(tid)
+        msg = (f"{tid}: {before} -> BID (fit {q.fit_score}). Draft r{pilot.drafts[tid].revision} "
+               f"{'passed' if report and report.passed else 'has open issues'}.")
+    elif q.decision == before:
+        msg = f"{tid}: still {q.decision} (fit {q.fit_score})" + (f"; {len(q.blockers)} blockers remain." if q.blockers else ".")
+    else:
+        msg = f"{tid}: {before} -> {q.decision} (fit {q.fit_score})."
     pilot.on_event("finish", msg)
     return msg

@@ -64,6 +64,9 @@ class Store:
             (tender_id, action, owner, self._now()),
         )
 
+    def answer_action(self, tender_id: str, action: str) -> None:
+        self._write("UPDATE actions SET status='answered' WHERE tender_id=? AND action=?", (tender_id, action))
+
     def rows(self, table: str) -> list[dict]:
         with self._lock:
             cur = self.db.execute(f"SELECT * FROM {table}")  # table names are internal constants

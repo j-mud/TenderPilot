@@ -136,6 +136,48 @@ def test_draft_streams_and_falls_back(tmp_path: Path):
     assert seen
 
 
+def test_bid_manager_answer_requalifies_and_drafts(tmp_path: Path):
+    """Answering 'Zakat renewed' turns T104 from CONDITIONAL_BID into BID and drafts it, without touching data/."""
+    import json
+
+    from agent.documents import ANSWERS_FILE
+    from agent.loop import resolve_answer
+
+    t = "T104_archive_digitization_ar"
+    pilot = make(tmp_path, FakeLLM())
+    run_pipeline(pilot)
+    assert pilot.qualifications[t].decision == "CONDITIONAL_BID" and t not in pilot.drafts
+    saved = json.loads(pilot.save(tmp_path / "out").read_text(encoding="utf-8"))
+    i = next(n for n, h in enumerate(saved["human_questions"]) if h["tender_id"] == t and "zakat" in h["question"].lower())
+    certs_on_disk = (SAMPLE / "company" / "certifications.json").read_text(encoding="utf-8")
+
+    # Continue the saved run, as the app does after "Send" (same tracker, not reset)
+    cont = TenderPilot(FakeLLM(), SAMPLE, Store(tmp_path / "t.db"))
+    cont.restore(saved)
+    resolve_answer(cont, i, "Zakat renewed, new certificate valid until 2027-12-01")
+    assert cont.qualifications[t].decision == "BID"
+    assert cont.drafts[t] and cont.verifications[t].passed  # drafted and verified automatically
+    assert cont.human_questions[i]["answer"].startswith("Zakat renewed")
+    assert '"valid_until": "2027-12-01"' in cont.company.files["certifications.json"]
+    assert "Zakat renewed" in cont.company.files[ANSWERS_FILE]
+    audit = cont.store.rows("audit")
+    assert {"screen", "answer", "knowledge"} <= {r["step"] for r in audit}  # earlier log kept, answer recorded
+    assert any(a["status"] == "answered" for a in cont.store.rows("actions"))
+    assert (SAMPLE / "company" / "certifications.json").read_text(encoding="utf-8") == certs_on_disk
+
+    # The saved run remembers the answer: a later answer builds on it
+    again = TenderPilot(FakeLLM(), SAMPLE, Store(tmp_path / "t2.db"))
+    again.restore(json.loads(cont.save(tmp_path / "out2").read_text(encoding="utf-8")))
+    assert '"valid_until": "2027-12-01"' in again.company.files["certifications.json"]
+
+    # A vague answer is recorded but changes no certificate: the guardrail still holds
+    vague = TenderPilot(FakeLLM(), SAMPLE, Store(tmp_path / "t3.db"))
+    vague.restore(saved)
+    resolve_answer(vague, i, "We have started the Zakat renewal.")
+    assert vague.qualifications[t].decision == "CONDITIONAL_BID" and t not in vague.drafts
+    assert vague.company.add_answer(t, "q", "Zakat and GOSI renewed until 2027-12-01") == []  # two certificates: ambiguous
+
+
 def test_run_budget_limits_live_runs(tmp_path: Path):
     from agent.run_budget import RunBudget
 
@@ -159,7 +201,7 @@ def test_app_password_gate_and_deployed_defaults():
     from streamlit.testing.v1 import AppTest
 
     local = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60).run()
-    assert not local.exception and not local.text_input  # no secret: no gate
+    assert not local.exception and not any(t.label == "Password" for t in local.text_input)  # no secret: no gate
     assert "my_company" in local.selectbox[0].options and not local.toggle[0].value
 
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60)
@@ -188,7 +230,7 @@ def test_app_password_gate_and_deployed_defaults():
     budget_file.write_text(json.dumps({"day": today, "runs": 10, "last_start": 0, "running_since": 0}))
     try:
         app.toggle[0].set_value(False).run()
-        app.button[0].click().run()
+        next(b for b in app.button if "Run TenderPilot" in b.label).click().run()
         assert any("daily limit" in w.value and "Load backup run" in w.value for w in app.warning)
         assert not app.exception and not app.status  # the run never started
     finally:
@@ -307,7 +349,8 @@ if __name__ == "__main__":
 
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
-               test_draft_streams_and_falls_back, test_run_budget_limits_live_runs,
+               test_draft_streams_and_falls_back, test_bid_manager_answer_requalifies_and_drafts,
+               test_run_budget_limits_live_runs,
                test_upload_pack_single_tender_flow, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
             fn(Path(d))

@@ -227,6 +227,8 @@ class TenderPilot:
             "- status 'met' ONLY if a company file proves it; put that file name in evidence.\n"
             "- A certificate that expires before the tender deadline is NOT met on the submission date: use 'gap'.\n"
             "- Anything in certifications_not_held is a 'gap'.\n"
+            "- bid_manager_answers.md (if present) holds the bid manager's answers given after review: it is company "
+            "evidence (cite it) and overrides older files where they conflict.\n"
             "- A certificate still valid on the deadline is 'met'; an expiry shortly after it is a note, not a gap.\n"
             "Requirements come in three kinds; only the first decides the bid:\n"
             "A. Eligibility and capability the company must already have (certificates, classification, past "
@@ -394,6 +396,29 @@ class TenderPilot:
         self.store.add_action(tender_id, question, owner="human")
         self._emit(tender_id, "human", f"Question for the bid manager: {question}")
         return "Recorded for the bid manager. Do not assume the answer; continue with other work."
+
+    def answer_question(self, index: int, answer: str) -> list[str]:
+        """The bid manager answers question #index: audit it and add it to the company knowledge for this run."""
+        h = self.human_questions[index]
+        h["answer"] = answer.strip()
+        self.store.answer_action(h["tender_id"], h["question"])
+        self._emit(h["tender_id"], "answer", f"Bid manager: {h['answer']}")
+        changes = self.company.add_answer(h["tender_id"], h["question"], h["answer"])
+        for change in changes:
+            self._emit(h["tender_id"], "knowledge", change)
+        return changes
+
+    def restore(self, results: dict) -> None:
+        """Continue a saved run (results.json): its analysis, drafts, questions, and answers given so far."""
+        self.extractions = {k: TenderExtraction.model_validate(v) for k, v in results.get("extractions", {}).items()}
+        self.qualifications = {k: Qualification.model_validate(v) for k, v in results.get("qualifications", {}).items()}
+        self.drafts = {k: ProposalDraft.model_validate(v) for k, v in results.get("drafts", {}).items()}
+        self.verifications = {k: VerificationReport.model_validate(v) for k, v in results.get("verifications", {}).items()}
+        self.shortlist = [ListingScore.model_validate(x) for x in results.get("shortlist", [])]
+        self.human_questions = [dict(h) for h in results.get("human_questions", [])]
+        for h in self.human_questions:
+            if h.get("answer"):
+                self.company.add_answer(h["tender_id"], h["question"], h["answer"])
 
     # ----------------------------------------------------------------- output
     def results(self) -> dict:

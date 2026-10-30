@@ -180,6 +180,12 @@ def normalize_deadline(value: str) -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------- company
+ANSWERS_FILE = "bid_manager_answers.md"
+ANSWERS_HEADER = ("# Answers from the bid manager\n"
+                  "Given after the review, so newer than the other company files.\n")
+_DATE = re.compile(r"\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?:\s*هـ)?|\d{1,2}[-/.]\d{1,2}[-/.]\d{4}(?:\s*هـ)?")
+
+
 class CompanyKnowledge:
     """The company's own files. Small enough to send to the model in full."""
 
@@ -220,3 +226,28 @@ class CompanyKnowledge:
 
     def not_held(self) -> list[str]:
         return self.certs.get("not_held", [])
+
+    def add_answer(self, tender_id: str, question: str, answer: str) -> list[str]:
+        """A bid manager's answer joins the knowledge for this run (files on disk are not changed).
+
+        Returns the certificate updates it caused, e.g. a renewal with a new expiry date.
+        """
+        entry = f"\n- [{tender_id}] Question: {question}\n  Answer: {answer}\n"
+        self.files[ANSWERS_FILE] = self.files.get(ANSWERS_FILE, ANSWERS_HEADER) + entry
+        return self._apply_renewal(answer)
+
+    def _apply_renewal(self, answer: str) -> list[str]:
+        """'Zakat renewed, valid until 2027-12-01' -> that certificate's new expiry date.
+
+        Only when unambiguous: exactly one certificate named (by its keyword, as a whole word)
+        and exactly one date. Anything else stays a plain statement in the answers file.
+        """
+        dates = {d for d in (normalize_deadline(m)[0] for m in _DATE.findall(answer)) if d}
+        certs = [c for c in self.certs.get("certifications", [])
+                 if c.get("keyword") and re.search(rf"\b{re.escape(c['keyword'])}\b", answer, re.I)]
+        if len(dates) != 1 or len(certs) != 1:
+            return []
+        cert, new = certs[0], dates.pop()
+        old, cert["valid_until"] = cert.get("valid_until", "?"), new
+        self.files["certifications.json"] = json.dumps(self.certs, ensure_ascii=False, indent=2)
+        return [f"{cert['name']}: valid until {old} -> {new} (from the bid manager's answer)"]
