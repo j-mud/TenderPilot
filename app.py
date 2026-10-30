@@ -241,14 +241,18 @@ for tab, r in zip(tabs, results["ranking"]):
 
         checks = {c["requirement_id"]: c for c in q["checks"]}
         matrix = [{
-            "ID": req["id"], "Requirement": req["text"], "Source": req["source"],
+            "ID": req["id"], "Requirement": short(req["text"], 68), "Source": short(req["source"], 16),
             "Mandatory": "Yes" if req["mandatory"] else "No",
             "Status": STATUS_LABEL[checks.get(req["id"], {}).get("status", "unknown")],
-            "Evidence": checks.get(req["id"], {}).get("evidence", ""),
-            "Note": checks.get(req["id"], {}).get("note", ""),
+            "Evidence": short(checks.get(req["id"], {}).get("evidence", ""), 20),
         } for req in e["requirements"]]
         st.markdown("**Compliance matrix**")
-        st.dataframe(pd.DataFrame(matrix), hide_index=True, width="stretch")
+        st.dataframe(pd.DataFrame(matrix), hide_index=True, width="stretch", column_config={
+            "ID": st.column_config.TextColumn(width=55), "Requirement": st.column_config.TextColumn(width=440),
+            "Source": st.column_config.TextColumn(width=110), "Mandatory": st.column_config.TextColumn(width=85),
+            "Status": st.column_config.TextColumn(width=100), "Evidence": st.column_config.TextColumn(width=140)})
+        with st.expander("Details: the note for each requirement"):
+            st.markdown("\n".join(f"- **{req['id']}** — {checks.get(req['id'], {}).get('note', '')}" for req in e["requirements"]))
 
         draft = results["drafts"].get(tid)
         if draft:

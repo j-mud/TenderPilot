@@ -68,7 +68,7 @@ The 5 tenders are extracted and qualified in parallel (about 50 s in total, down
 Most of the remaining time is the single proposal-drafting call, which the UI streams live.
 Run times vary with API load.
 
-| Proposal written live | Ranking and listing screen | Compliance matrix and proposal |
+| Proposal written live | Ranking and listing screen | Compliance matrix with cited evidence |
 |---|---|---|
 | ![Streaming draft](docs/ui_streaming.png) | ![Overview](docs/ui_overview.png) | ![Details](docs/ui_details.png) |
 
