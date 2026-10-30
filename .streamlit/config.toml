@@ -5,3 +5,6 @@ headless = true
 
 [browser]
 gatherUsageStats = false
+
+[theme]
+primaryColor = "#0F9D7A"

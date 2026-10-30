@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import html
 import json
 import os
 import re
@@ -44,6 +45,26 @@ def draft_preview(partial_json: str) -> str:
             text = raw
         out.append(f"#### {text}" if key == "title" else text)
     return "\n\n".join(out) + " ▌"
+
+
+ARABIC_RUN = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿\s\d،؛:/\-–]*")
+
+
+def english_part(text: str) -> str:
+    """Mixed Arabic/English renders badly in tables: keep the English part (pure Arabic stays as is)."""
+    if not ARABIC_RUN.search(text):
+        return text
+    latin = re.sub(r"\(\s*\)|\[\s*\]", "", ARABIC_RUN.sub(" ", text))
+    latin = re.sub(r"\s{2,}", " ", latin).strip(" -–—:/|،")
+    return latin if re.search("[A-Za-z]", latin) else text
+
+
+def arabic_part(text: str) -> str:
+    return " ".join(m.strip(" -–—:/") for m in ARABIC_RUN.findall(text)).strip()
+
+
+def short(text: str, n: int) -> str:
+    return text if len(text) <= n else text[: n - 1].rstrip() + "…"
 
 
 st.set_page_config(page_title="TenderPilot", page_icon="🧭", layout="wide")
@@ -156,12 +177,19 @@ if results.get("shortlist"):
     shortlist = sorted(results["shortlist"], key=lambda x: (REC_ORDER[x["recommend"]], -x["relevance"]))
     rows = [{
         "Ref": x["reference"], "Recommendation": rec_label(x), "Relevance": x["relevance"],
-        "Title": by_ref.get(x["reference"], {}).get("title", ""),
-        "Entity": by_ref.get(x["reference"], {}).get("entity", ""),
-        "Deadline": by_ref.get(x["reference"], {}).get("deadline", ""), "Why": x["reason"],
+        "Title": short(english_part(by_ref.get(x["reference"], {}).get("title", "")), 44),
+        "Entity": short(english_part(by_ref.get(x["reference"], {}).get("entity", "")), 30),
+        "Deadline": by_ref.get(x["reference"], {}).get("deadline", ""),
     } for x in shortlist]
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
-                 column_config={"Relevance": st.column_config.ProgressColumn("Relevance", min_value=0, max_value=100, format="%d")})
+    # widths in px: the six columns fit in the ~940px table of a 1400px-wide window
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", column_config={
+        "Ref": st.column_config.TextColumn(width=85), "Recommendation": st.column_config.TextColumn(width=170),
+        "Relevance": st.column_config.ProgressColumn("Relevance", min_value=0, max_value=100, format="%d", width=105),
+        "Title": st.column_config.TextColumn(width=280), "Entity": st.column_config.TextColumn(width=195),
+        "Deadline": st.column_config.TextColumn(width=90)})
+    with st.expander("Why: the agent's reason for each listing"):
+        st.dataframe(pd.DataFrame([{"Ref": x["reference"], "Why": x["reason"]} for x in shortlist]),
+                     hide_index=True, width="stretch", column_config={"Ref": st.column_config.TextColumn(width=85)})
 
 # ------------------------------------------------------------------ ranking
 if not results["ranking"]:
@@ -172,12 +200,14 @@ rank_rows = []
 for r in results["ranking"]:
     e = exts.get(r["tender_id"], {})
     rank_rows.append({
-        "Tender": r["tender_id"], "Title": e.get("title", ""), "Deadline": e.get("deadline", ""),
-        "Value (SAR)": f"{e.get('estimated_value_sar') or 0:,.0f}", "Decision": DECISION_LABEL[r["decision"]],
-        "Fit": r["fit_score"], "Blockers": len(r["blockers"]),
+        "Tender": r["tender_id"], "Title": short(english_part(e.get("title", "")), 54), "Deadline": e.get("deadline", ""),
+        "Decision": DECISION_LABEL[r["decision"]], "Fit": r["fit_score"], "Blockers": len(r["blockers"]),
     })
-st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch",
-             column_config={"Fit": st.column_config.ProgressColumn("Fit", min_value=0, max_value=100, format="%d")})
+st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch", column_config={
+    "Tender": st.column_config.TextColumn(width=205), "Title": st.column_config.TextColumn(width=345),
+    "Deadline": st.column_config.TextColumn(width=90), "Decision": st.column_config.TextColumn(width=140),
+    "Fit": st.column_config.ProgressColumn("Fit", min_value=0, max_value=100, format="%d", width=85),
+    "Blockers": st.column_config.NumberColumn(width=65)})
 
 if results["human_questions"]:
     st.subheader("🙋 Waiting on you")
@@ -191,7 +221,12 @@ for tab, r in zip(tabs, results["ranking"]):
     tid = r["tender_id"]
     e, q = exts[tid], quals[tid]
     with tab:
-        st.markdown(f"### {e['title']}\n*{e['issuer']}* · deadline **{e['deadline']}** · {DECISION_LABEL[q['decision']]} (fit {q['fit_score']})")
+        st.markdown(f"### {english_part(e['title'])}")
+        if english_part(e["title"]) != e["title"] and arabic_part(e["title"]):  # bilingual: Arabic on its own RTL line
+            st.markdown(f'<div dir="rtl" style="font-size:1.25rem;margin:-0.5rem 0 0.5rem">{html.escape(arabic_part(e["title"]))}</div>',
+                        unsafe_allow_html=True)
+        value = f" · value **SAR {e['estimated_value_sar']:,.0f}**" if e.get("estimated_value_sar") else ""
+        st.markdown(f"*{e['issuer']}* · deadline **{e['deadline']}**{value} · {DECISION_LABEL[q['decision']]} (fit {q['fit_score']})")
         st.write(e["summary"])
         left, right = st.columns(2)
         left.markdown("**Why**\n" + "\n".join(f"- {x}" for x in q["reasons"]))
