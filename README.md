@@ -56,7 +56,7 @@ requirement recall and traps caught.
 
 ## Live demo
 
-**[TenderPilot on Streamlit Community Cloud](https://YOUR-APP.streamlit.app)**: password available on request.
+**[TenderPilot on Streamlit Community Cloud](https://tenderpilot-demo.streamlit.app/)**: password available on request.
 
 The public app opens on a saved run of the fictional sample data. Visitors can switch off **Load backup run** to
 start a live run; live runs are limited to 10 per day, one at a time, at most one every 2 minutes.
