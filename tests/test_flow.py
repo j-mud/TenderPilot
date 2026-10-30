@@ -170,9 +170,13 @@ def test_app_password_gate_and_deployed_defaults():
     assert app.error and not app.selectbox
     app.text_input[0].input("open sesame").run()
     assert not app.exception and not app.text_input
-    assert app.selectbox[0].options == ["sample"]  # my_company hidden when deployed
+    assert app.selectbox[0].options == ["sample", "Upload a tender"]  # my_company hidden when deployed
     assert app.toggle[0].value  # opens on the backup run
     assert any("Live runs left today" in c.value for c in app.sidebar.caption)
+    app.selectbox[0].select("Upload a tender").run()
+    assert app.radio[0].options == ["Falak AI (fictional sample)"]  # no my_company profile either
+    assert any("sent to the AI provider" in c.value for c in app.sidebar.caption)
+    app.selectbox[0].select("sample").run()
 
     # Daily limit reached: Run shows a message pointing to the backup and never calls the API.
     import json
@@ -199,6 +203,64 @@ def _make_pdf(path: Path, pages: list[str]) -> None:
         page = doc.new_page()
         page.insert_textbox(fitz.Rect(50, 50, 550, 800), text, fontsize=10)
     doc.save(path)
+
+
+def test_upload_pack_single_tender_flow(tmp_path: Path):
+    """An uploaded PDF pack + meta.json runs extract -> qualify -> draft -> verify in a temp session folder."""
+    from agent import uploads
+    from agent.loop import run_single
+
+    data_before = sorted(p for p in (ROOT / "data").rglob("*") if p.is_file())
+    src = tmp_path / "src"
+    src.mkdir()
+    filler = "General conditions. The contractor shall comply with applicable laws. " * 25
+    booklet = ["Tender No. U-2026\nTitle: Permit OCR platform"] + [f"Section {i}\n{filler}" for i in range(2, 12)]
+    booklet.insert(2, "3.1 Valid Commercial Registration.\n3.2 ISO/IEC 27001 certification.")
+    _make_pdf(src / "booklet.pdf", booklet)
+    _make_pdf(src / "appendix_b.pdf", ["Appendix B\nB.1 Valid Zakat certificate. Mandatory."])
+    files = [(p.name, p.read_bytes()) for p in (src / "booklet.pdf", src / "appendix_b.pdf")]
+
+    session = tmp_path / "uploads" / "session1"
+    meta = uploads.build_meta("Permit OCR platform", "1448-06-24 هـ", "2,500,000")
+    data_dir, tid = uploads.save_pack(session, files, meta)
+    assert data_dir == session and (session / "tenders" / tid / "meta.json").exists()
+    out = session / "results"
+    pilot = TenderPilot(FakeLLM(), data_dir, Store(out / "tracker.db"), on_event=lambda k, m: None,
+                        company_dir=SAMPLE / "company")
+    assert list(pilot.tenders) == [tid] and not pilot.listings
+    run_single(pilot, tid)
+    ext, q = pilot.extractions[tid], pilot.qualifications[tid]
+    assert ext.title == "Permit OCR platform" and ext.estimated_value_sar == 2_500_000  # meta.json wins
+    assert ext.deadline.startswith("2026-12")  # Hijri converted
+    assert any("Zakat" in r.text for r in ext.requirements)  # found in the second file
+    assert q.decision in ("BID", "CONDITIONAL_BID") and pilot.verifications[tid].passed
+    pilot.save(out)
+    assert (out / "results.json").exists() and (out / f"proposal_{tid}.docx").exists()
+
+    # A new upload replaces the old one; a NO_BID tender is not drafted.
+    (src / "appendix_b.pdf").unlink()
+    _make_pdf(src / "appendix_b.pdf", ["Appendix B\nB.1 Bidders must hold an active CMMI Level 3 appraisal. Mandatory."])
+    files2 = [(p.name, p.read_bytes()) for p in (src / "booklet.pdf", src / "appendix_b.pdf")]
+    data_dir, tid2 = uploads.save_pack(session, files2, uploads.build_meta("Smart city analytics"))
+    assert not (session / "tenders" / tid).exists() and not out.exists()
+    pilot2 = TenderPilot(FakeLLM(), data_dir, Store(tmp_path / "t2.db"), company_dir=SAMPLE / "company")
+    run_single(pilot2, tid2)
+    assert pilot2.qualifications[tid2].decision == "NO_BID" and not pilot2.drafts
+
+    # Rejected uploads, with messages for the user
+    for bad, kwargs in ([("tool.exe", b"x")], {}), (files, {"max_file_mb": 0.001}), (files, {"max_pages": 5}):
+        try:
+            uploads.save_pack(tmp_path / "uploads" / "session2", bad, {}, **kwargs)
+            raise AssertionError(f"accepted {kwargs or bad[0][0]}")
+        except uploads.UploadError as err:
+            assert any(w in str(err) for w in ("unsupported", "limit")), err
+    assert not (tmp_path / "uploads" / "session2").exists()  # nothing left behind
+    try:
+        uploads.build_meta(deadline="next Tuesday")
+        raise AssertionError("accepted a bad deadline")
+    except uploads.UploadError:
+        pass
+    assert sorted(p for p in (ROOT / "data").rglob("*") if p.is_file()) == data_before  # never writes into data/
 
 
 def test_real_style_pack_long_pdf_hijri(tmp_path: Path):
@@ -246,7 +308,7 @@ if __name__ == "__main__":
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
                test_draft_streams_and_falls_back, test_run_budget_limits_live_runs,
-               test_real_style_pack_long_pdf_hijri):
+               test_upload_pack_single_tender_flow, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
             fn(Path(d))
             print("PASS", fn.__name__)

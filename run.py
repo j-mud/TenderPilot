@@ -27,11 +27,11 @@ def output_dir(data_dir: Path) -> Path:
     return ROOT / "output" / Path(data_dir).name
 
 
-def build_pilot(data_dir: Path, on_event=None) -> TenderPilot:
+def build_pilot(data_dir: Path, on_event=None, company_dir: Path | None = None, out_dir: Path | None = None) -> TenderPilot:
     load_dotenv(ROOT / ".env")
-    store = Store(output_dir(data_dir) / "tracker.db")
+    store = Store((out_dir or output_dir(data_dir)) / "tracker.db")
     store.reset()
-    return TenderPilot(LLM(), Path(data_dir), store, on_event=on_event)
+    return TenderPilot(LLM(), Path(data_dir), store, on_event=on_event, company_dir=company_dir)
 
 
 def main() -> None:

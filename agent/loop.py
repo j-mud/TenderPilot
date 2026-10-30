@@ -1,8 +1,9 @@
-"""Two ways to run TenderPilot.
+"""Ways to run TenderPilot.
 
 run_agent():    the LLM is the orchestrator. It sees the goal and the tools and
                 decides what to call next (this is the autonomous mode to demo).
 run_pipeline(): the same tools in a fixed order. Use it as a reliable fallback.
+run_single():   one uploaded tender pack: extract, qualify, then draft + verify if worth bidding.
 """
 from __future__ import annotations
 
@@ -135,13 +136,7 @@ def run_pipeline(pilot: TenderPilot, goal: str = "", max_revisions: int = 2) -> 
         pilot.on_event("finish", msg)
         return msg
     tid = best["tender_id"]
-    pilot.draft_proposal(tid)
-    for _ in range(max_revisions + 1):
-        if pilot.verify_proposal(tid).passed:
-            break
-        if pilot.drafts[tid].revision > max_revisions:
-            break
-        pilot.draft_proposal(tid)
+    _draft_and_verify(pilot, tid, max_revisions)
     for r in ranking:
         if r["decision"] == "CONDITIONAL_BID":
             for b in r["blockers"]:
@@ -152,5 +147,36 @@ def run_pipeline(pilot: TenderPilot, goal: str = "", max_revisions: int = 2) -> 
         f"Draft r{pilot.drafts[tid].revision} {'passed' if report and report.passed else 'has open issues'}; "
         f"{len(pilot.human_questions)} questions for the bid manager."
     )
+    pilot.on_event("finish", msg)
+    return msg
+
+
+def _draft_and_verify(pilot: TenderPilot, tid: str, max_revisions: int) -> None:
+    """Draft, verify, and redraft from the verifier's issues until it passes or revisions run out."""
+    pilot.draft_proposal(tid)
+    for _ in range(max_revisions + 1):
+        if pilot.verify_proposal(tid).passed:
+            break
+        if pilot.drafts[tid].revision > max_revisions:
+            break
+        pilot.draft_proposal(tid)
+
+
+def run_single(pilot: TenderPilot, tender_id: str, max_revisions: int = 2) -> str:
+    """One uploaded tender: extract -> qualify -> draft + verify only if worth bidding. No listings."""
+    pilot.on_event("plan", f"Analyzing one tender: {tender_id} (extract -> qualify -> draft -> verify)")
+    q = pilot.qualify_tender(tender_id)  # extracts first
+    if q.decision == "NO_BID":
+        msg = f"{tender_id}: NO_BID (fit {q.fit_score}). Not drafting a proposal. Blockers: {len(q.blockers)}."
+        pilot.on_event("finish", msg)
+        return msg
+    _draft_and_verify(pilot, tender_id, max_revisions)
+    if q.decision == "CONDITIONAL_BID":
+        for b in q.blockers:
+            pilot.request_human_input(tender_id, f"Please resolve: {b}")
+    report = pilot.verifications.get(tender_id)
+    msg = (f"{tender_id}: {q.decision} (fit {q.fit_score}). Draft r{pilot.drafts[tender_id].revision} "
+           f"{'passed' if report and report.passed else 'has open issues'}; "
+           f"{len(pilot.human_questions)} questions for the bid manager.")
     pilot.on_event("finish", msg)
     return msg

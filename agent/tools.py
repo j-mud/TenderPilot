@@ -55,11 +55,13 @@ def today() -> date:
 
 
 class TenderPilot:
-    def __init__(self, llm: LLM, data_dir: Path, store: Store, on_event: EventFn | None = None):
+    def __init__(self, llm: LLM, data_dir: Path, store: Store, on_event: EventFn | None = None,
+                 company_dir: Path | None = None):
         self.llm = llm
         self.store = store
         self.data_dir = data_dir
         self.tenders: dict[str, Tender] = load_tenders(data_dir / "tenders")
+        company_dir = company_dir or data_dir / "company"  # an uploaded tender is checked against a chosen company
         # Tools may run in worker threads: keep events in one piece, extract each tender once.
         event_fn, event_lock = on_event or (lambda kind, msg: None), threading.Lock()
 
@@ -71,7 +73,7 @@ class TenderPilot:
         self.thread_init: Callable[[], None] | None = None  # e.g. lets Streamlit write from workers
         self.on_stream: Callable[[str, str], None] | None = None  # (tender_id, text chunk) while a draft is written
         self._tender_locks = {tid: threading.Lock() for tid in self.tenders}
-        self.company = CompanyKnowledge(data_dir / "company")
+        self.company = CompanyKnowledge(company_dir)
         self.listings = load_listings(data_dir / "listings.csv")
         self.shortlist: list[ListingScore] = []
         self.extractions: dict[str, TenderExtraction] = {}
@@ -152,13 +154,13 @@ class TenderPilot:
             result = self.llm.structured(ANALYST_SYSTEM, prompt, TenderExtraction)
         else:
             self._emit(tender_id, "extract", f"Long document ({len(tender.text):,} chars): reading in {len(chunks)} parts")
-            parts = []
-            for i, chunk in enumerate(chunks, start=1):
-                prompt = (
-                    f"Tender ID: {tender_id}. This is PART {i} of {len(chunks)} of the tender pack.\n\n"
-                    f"{chunk}\n\n{instructions} Leave title/issuer/deadline/summary empty if not in this part."
-                )
-                parts.append(self.llm.structured(ANALYST_SYSTEM, prompt, ChunkExtraction))
+            prompts = [
+                f"Tender ID: {tender_id}. This is PART {i} of {len(chunks)} of the tender pack.\n\n"
+                f"{chunk}\n\n{instructions} Leave title/issuer/deadline/summary empty if not in this part."
+                for i, chunk in enumerate(chunks, start=1)
+            ]
+            # parts are independent: read them in parallel, merge in document order
+            parts = self.parallel(lambda p: self.llm.structured(ANALYST_SYSTEM, p, ChunkExtraction), prompts)
             result = self._merge_parts(tender_id, parts)
         result.tender_id = tender_id
         self._apply_meta(result, tender.meta)
