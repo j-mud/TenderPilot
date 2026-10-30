@@ -165,10 +165,10 @@ def _draft_and_verify(pilot: TenderPilot, tid: str, max_revisions: int) -> None:
 
 def run_single(pilot: TenderPilot, tender_id: str, max_revisions: int = 2) -> str:
     """One uploaded tender: extract -> qualify -> draft + verify only if worth bidding. No listings."""
-    pilot.on_event("plan", f"Analyzing one tender: {tender_id} (extract -> qualify -> draft -> verify)")
+    pilot.on_event("plan", f"Analyzing one tender: {pilot.label(tender_id)} (extract -> qualify -> draft -> verify)")
     q = pilot.qualify_tender(tender_id)  # extracts first
     if q.decision == "NO_BID":
-        msg = f"{tender_id}: NO_BID (fit {q.fit_score}). Not drafting a proposal. Blockers: {len(q.blockers)}."
+        msg = f"{pilot.label(tender_id)}: NO_BID (fit {q.fit_score}). Not drafting a proposal. Blockers: {len(q.blockers)}."
         pilot.on_event("finish", msg)
         return msg
     _draft_and_verify(pilot, tender_id, max_revisions)
@@ -176,7 +176,7 @@ def run_single(pilot: TenderPilot, tender_id: str, max_revisions: int = 2) -> st
         for b in q.blockers:
             pilot.request_human_input(tender_id, f"Please resolve: {b}")
     report = pilot.verifications.get(tender_id)
-    msg = (f"{tender_id}: {q.decision} (fit {q.fit_score}). Draft r{pilot.drafts[tender_id].revision} "
+    msg = (f"{pilot.label(tender_id)}: {q.decision} (fit {q.fit_score}). Draft r{pilot.drafts[tender_id].revision} "
            f"{'passed' if report and report.passed else 'has open issues'}; "
            f"{len(pilot.human_questions)} questions for the bid manager.")
     pilot.on_event("finish", msg)
@@ -188,17 +188,17 @@ def resolve_answer(pilot: TenderPilot, index: int, answer: str, max_revisions: i
     just become a BID, draft and verify its proposal."""
     tid = pilot.human_questions[index]["tender_id"]
     before = pilot.qualifications[tid].decision
-    pilot.on_event("plan", f"Answer received for {tid}: re-qualifying with it")
+    pilot.on_event("plan", f"Answer received for {pilot.label(tid)}: re-qualifying with it")
     pilot.answer_question(index, answer)
     q = pilot.qualify_tender(tid)
     if q.decision == "BID" and before != "BID":
         _draft_and_verify(pilot, tid, max_revisions)
         report = pilot.verifications.get(tid)
-        msg = (f"{tid}: {before} -> BID (fit {q.fit_score}). Draft r{pilot.drafts[tid].revision} "
+        msg = (f"{pilot.label(tid)}: {before} -> BID (fit {q.fit_score}). Draft r{pilot.drafts[tid].revision} "
                f"{'passed' if report and report.passed else 'has open issues'}.")
     elif q.decision == before:
-        msg = f"{tid}: still {q.decision} (fit {q.fit_score})" + (f"; {len(q.blockers)} blockers remain." if q.blockers else ".")
+        msg = f"{pilot.label(tid)}: still {q.decision} (fit {q.fit_score})" + (f"; {len(q.blockers)} blockers remain." if q.blockers else ".")
     else:
-        msg = f"{tid}: {before} -> {q.decision} (fit {q.fit_score})."
+        msg = f"{pilot.label(tid)}: {before} -> {q.decision} (fit {q.fit_score})."
     pilot.on_event("finish", msg)
     return msg

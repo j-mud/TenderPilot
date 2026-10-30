@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 from agent import uploads
 from agent.documents import normalize_deadline
 from agent.run_budget import RunBudget
+from agent.schemas import clean_title, shorten
 from agent.uploads import MAX_FILE_MB, MAX_PAGES
 from eval import score
 from run import DEFAULT_GOAL, output_dir
@@ -77,7 +78,7 @@ def draft_preview(partial_json: str) -> str:
             text = json.loads(f'"{raw.rstrip(chr(92))}"')  # drop an escape cut off mid-stream
         except json.JSONDecodeError:
             text = raw
-        out.append(f"#### {text}" if key == "title" else text)
+        out.append(f"#### {clean_title(text)}" if key == "title" else text)
     return "\n\n".join(out) + " ▌"
 
 
@@ -97,8 +98,7 @@ def arabic_part(text: str) -> str:
     return " ".join(m.strip(" -–—:/") for m in ARABIC_RUN.findall(text)).strip()
 
 
-def short(text: str, n: int) -> str:
-    return text if len(text) <= n else text[: n - 1].rstrip() + "…"
+short = shorten  # cut at a word boundary, ending in "…"
 
 
 st.set_page_config(page_title="TenderPilot", page_icon="🧭", layout="wide")
@@ -223,7 +223,7 @@ def run_live(build, work) -> None:
                 st.warning(f"Company files still contain TODO placeholders: {', '.join(pilot.company.unfinished())}")
             summary = work(pilot)
             pilot.save(OUT)
-            status.update(label=f"Done. {summary[:120]}", state="complete", expanded=False)
+            status.update(label=f"Done. {short(summary, 140)}", state="complete", expanded=False)
         except Exception as err:
             status.update(label="Run failed", state="error")
             st.exception(err)
@@ -327,7 +327,7 @@ rank_rows = []
 for r in results["ranking"]:
     e = exts.get(r["tender_id"], {})
     rank_rows.append({
-        "Tender": short(r["tender_id"], 27), "Title": short(english_part(e.get("title", "")), 54), "Deadline": e.get("deadline", ""),
+        "Tender": "Uploaded tender" if r["tender_id"].startswith("UPLOAD_") else short(r["tender_id"], 27), "Title": short(english_part(e.get("title", "")), 54), "Deadline": e.get("deadline", ""),
         "Decision": DECISION_LABEL[r["decision"]], "Fit": r["fit_score"], "Blockers": len(r["blockers"]),
     })
 st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch", column_config={
@@ -335,6 +335,19 @@ st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch", column_c
     "Deadline": st.column_config.TextColumn(width=90), "Decision": st.column_config.TextColumn(width=140),
     "Fit": st.column_config.ProgressColumn("Fit", min_value=0, max_value=100, format="%d", width=85),
     "Blockers": st.column_config.NumberColumn(width=65)})
+
+def tender_label(tender_id: str) -> str:
+    """An uploaded pack is shown by its extracted title (shortened), not as 'UPLOAD_<filename>'."""
+    if not tender_id.startswith("UPLOAD_"):
+        return tender_id
+    return short(english_part(exts.get(tender_id, {}).get("title", "")), 48) or tender_id
+
+
+def answer_hint(question: str) -> str:
+    if re.search(r"certificat|renew|expir", question, re.I):
+        return "e.g. Renewed, new certificate valid until YYYY-MM-DD"
+    return "Type your answer, e.g. done, with any details"
+
 
 def queue_answer(index: int, question: str, key: str) -> None:
     """'Send' callback: handled at the top of the next rerun, where the live log is shown."""
@@ -348,21 +361,22 @@ if results["human_questions"]:
         st.caption("Turn off **Load backup run** to answer these questions; the agent then re-checks the tender.")
     for i, hq in enumerate(results["human_questions"]):
         if hq.get("answer"):
-            st.success(f"**{hq['tender_id']}** — {hq['question']}\n\n**Your answer:** {hq['answer']}", icon="✅")
+            st.success(f"**{tender_label(hq['tender_id'])}** — {hq['question']}\n\n**Your answer:** {hq['answer']}", icon="✅")
             continue
-        st.warning(f"**{hq['tender_id']}** — {hq['question']}")
+        st.warning(f"**{tender_label(hq['tender_id'])}** — {hq['question']}")
         if use_backup:
             continue
         with st.form(f"answer_form_{i}", clear_on_submit=True, border=False):
             box, send = st.columns([6, 1], vertical_alignment="bottom")
             box.text_input("Your answer", key=f"answer_{i}", label_visibility="collapsed",
-                           placeholder="Your answer, e.g. Zakat renewed, new certificate valid until 2027-12-01")
+                           placeholder=answer_hint(hq["question"]))
             send.form_submit_button("Send", type="primary", width="stretch",
                                     on_click=queue_answer, args=(i, hq["question"], f"answer_{i}"))
 
 # ---------------------------------------------------------------- per tender
 st.subheader("Tender details")
-prefixes = [r["tender_id"].split("_")[0].replace("UPLOAD", "Uploaded tender") for r in results["ranking"]]
+prefixes = [tender_label(r["tender_id"]) if r["tender_id"].startswith("UPLOAD_") else r["tender_id"].split("_")[0]
+            for r in results["ranking"]]
 tab_ids = [p if prefixes.count(p) == 1 else r["tender_id"] for p, r in zip(prefixes, results["ranking"])]  # "T101"
 tabs = st.tabs([f"{t} · {DECISION_LABEL[r['decision']]}" for t, r in zip(tab_ids, results["ranking"])] + ["Audit log"])
 for tab, r in zip(tabs, results["ranking"]):
@@ -406,7 +420,7 @@ for tab, r in zip(tabs, results["ranking"]):
             st.markdown(f"**Proposal draft r{draft['revision']}** — verification: "
                         + ("✅ passed" if ver and ver["passed"] else f"⚠️ {len(ver['issues']) if ver else '?'} open issues"))
             for sec in draft["sections"]:
-                with st.expander(sec["title"]):
+                with st.expander(clean_title(sec["title"])):
                     st.write(sec["content"])
             if ver and ver["issues"]:
                 with st.expander("Verification issues"):

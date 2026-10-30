@@ -5,9 +5,10 @@ validated before the next stage uses it.
 """
 from __future__ import annotations
 
+import re
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 Category = Literal["eligibility", "technical", "financial", "document", "timeline", "other"]
@@ -72,9 +73,30 @@ class Qualification(BaseModel):
     checks: list[RequirementCheck]
 
 
+def shorten(text: str, n: int) -> str:
+    """At most n characters, cut at a word boundary when one is near, ending in '…'."""
+    if len(text) <= n:
+        return text
+    cut = text[: n - 1]
+    if " " in cut[n // 2:]:
+        cut = cut[: cut.rfind(" ")]
+    return cut.rstrip(" ,;:-") + "…"
+
+
+def clean_title(title: str) -> str:
+    """'4. Relevant experience (cite past projects by name and value)' -> 'Relevant experience'."""
+    cleaned = re.sub(r"\s*\([^)]*\)", "", re.sub(r"^\s*\d+[.)]\s*", "", title)).strip(" :-")
+    return cleaned or title.strip()
+
+
 class ProposalSection(BaseModel):
     title: str
     content: str
+
+    @field_validator("title")
+    @classmethod
+    def _clean(cls, title: str) -> str:  # the model sometimes copies numbering or instructions into titles
+        return clean_title(title)
 
 
 class ProposalDraft(BaseModel):

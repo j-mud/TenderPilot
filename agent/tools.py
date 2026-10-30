@@ -31,6 +31,7 @@ from .schemas import (
     TenderExtraction,
     VerificationIssue,
     VerificationReport,
+    shorten,
 )
 from .store import Store
 
@@ -83,9 +84,18 @@ class TenderPilot:
         self.human_questions: list[dict] = []
 
     # ---------------------------------------------------------------- helpers
+    def label(self, tender_id: str) -> str:
+        """What to call a tender in messages: an uploaded pack by its (short) title, not 'UPLOAD_<filename>'."""
+        if not tender_id.startswith("UPLOAD_"):
+            return tender_id
+        ext, meta = self.extractions.get(tender_id), self.tenders[tender_id].meta if tender_id in self.tenders else {}
+        title = (ext.title if ext else "") or meta.get("title") or ""
+        english = re.split(r"[؀-ۿ]", title)[0].rstrip(" ([-–—:/|")  # bilingual title: its English part
+        return shorten(english or title, 48) or tender_id
+
     def _emit(self, tender_id: str, step: str, msg: str) -> None:
         self.store.log(tender_id, step, msg)
-        self.on_event(step, f"[{tender_id}] {msg}" if tender_id != "-" else msg)
+        self.on_event(step, f"[{self.label(tender_id)}] {msg}" if tender_id != "-" else msg)
 
     def _require(self, tender_id: str) -> None:
         if tender_id not in self.tenders:
@@ -347,10 +357,12 @@ class TenderPilot:
             f"QUALIFICATION:\n{q.model_dump_json(indent=1)}\n\n"
             f"COMPANY FILES:\n{self.company.context()}\n\n"
             "Write a first-draft technical proposal with these sections, in this order:\n"
-            "1. Executive summary\n2. Understanding of requirements\n3. Technical approach and methodology\n"
-            "4. Relevant experience (cite past projects by name and value)\n5. Team\n"
-            "6. Compliance statement (one line per requirement: '<id>: <how we comply or why not>')\n"
-            "7. Open items for human review (every requirement with status gap/partial/unknown, by id)\n"
+            "Executive summary | Understanding of requirements | Technical approach and methodology | "
+            "Relevant experience | Team | Compliance statement | Open items for human review\n"
+            "Use exactly those titles: no numbers, no notes in brackets. What goes in them:\n"
+            "- Relevant experience: cite past projects by name and value.\n"
+            "- Compliance statement: one line per requirement, '<id>: <how we comply or why not>'.\n"
+            "- Open items for human review: every requirement with status gap/partial/unknown, by id.\n"
             f"{self._deadline_note(tender_id, ext)}"
             "Never claim anything not supported by the company files. Where evidence is missing write "
             "'[TO CONFIRM: ...]'. Write in clear professional English."

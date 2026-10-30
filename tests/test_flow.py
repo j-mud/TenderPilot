@@ -205,6 +205,24 @@ def test_prompts_use_plain_words_and_verified_hijri_deadline(tmp_path: Path):
         assert "2026-12-04" in p and "Umm al-Qura" in p and "Never call it approximate" in p
 
 
+def test_section_titles_are_clean_in_draft_and_docx(tmp_path: Path):
+    from docx import Document
+
+    from agent.export import proposal_to_docx
+    from agent.schemas import ProposalDraft
+
+    pilot = make(tmp_path, FakeLLM())
+    t = "T101_citizen_ai_assistant"
+    pilot.qualify_tender(t)
+    draft = ProposalDraft.model_validate({"tender_id": t, "sections": [
+        {"title": "4. Relevant experience (cite past projects by name and value)", "content": "P1."},
+        {"title": "6. Compliance statement (one line per requirement: '<id>: <how>')", "content": "R1: yes"}]})
+    assert [s.title for s in draft.sections] == ["Relevant experience", "Compliance statement"]
+    proposal_to_docx(draft, pilot.extractions[t], pilot.qualifications[t], tmp_path / "p.docx")
+    headings = [p.text for p in Document(tmp_path / "p.docx").paragraphs if p.style.name.startswith("Heading")]
+    assert "Relevant experience" in headings and not any("(" in h or h[:1].isdigit() for h in headings), headings
+
+
 def test_run_budget_limits_live_runs(tmp_path: Path):
     from agent.run_budget import RunBudget
 
@@ -294,10 +312,13 @@ def test_upload_pack_single_tender_flow(tmp_path: Path):
     data_dir, tid = uploads.save_pack(session, files, meta)
     assert data_dir == session and (session / "tenders" / tid / "meta.json").exists()
     out = session / "results"
-    pilot = TenderPilot(FakeLLM(), data_dir, Store(out / "tracker.db"), on_event=lambda k, m: None,
+    events = []
+    pilot = TenderPilot(FakeLLM(), data_dir, Store(out / "tracker.db"), on_event=lambda k, m: events.append(m),
                         company_dir=SAMPLE / "company")
     assert list(pilot.tenders) == [tid] and not pilot.listings
-    run_single(pilot, tid)
+    summary = run_single(pilot, tid)
+    assert pilot.label(tid) == "Permit OCR platform" and summary.startswith("Permit OCR platform:")  # not UPLOAD_...
+    assert not any("UPLOAD_" in m for m in events)
     ext, q = pilot.extractions[tid], pilot.qualifications[tid]
     assert ext.title == "Permit OCR platform" and ext.estimated_value_sar == 2_500_000  # meta.json wins
     assert ext.deadline.startswith("2026-12")  # Hijri converted
@@ -377,7 +398,7 @@ if __name__ == "__main__":
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
                test_draft_streams_and_falls_back, test_bid_manager_answer_requalifies_and_drafts,
-               test_prompts_use_plain_words_and_verified_hijri_deadline,
+               test_prompts_use_plain_words_and_verified_hijri_deadline, test_section_titles_are_clean_in_draft_and_docx,
                test_run_budget_limits_live_runs,
                test_upload_pack_single_tender_flow, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
