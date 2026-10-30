@@ -136,6 +136,61 @@ def test_draft_streams_and_falls_back(tmp_path: Path):
     assert seen
 
 
+def test_run_budget_limits_live_runs(tmp_path: Path):
+    from agent.run_budget import RunBudget
+
+    budget = RunBudget(tmp_path / "budget.json", max_per_day=2, cooldown_s=120, max_run_s=600)
+    t = 1_800_000_000  # a fixed moment, mid-day UTC
+    assert budget.try_start(t) is None
+    assert "in progress" in budget.try_start(t + 10)  # one live run at a time
+    budget.finish(t + 90)
+    assert "wait" in budget.try_start(t + 100)  # still inside the 2-minute cooldown
+    assert budget.try_start(t + 130) is None
+    assert budget.remaining(t + 131) == 0
+    budget.finish(t + 300)
+    assert "daily limit" in budget.try_start(t + 400)
+    day2 = t + 86_400
+    assert budget.try_start(day2) is None  # next UTC day: count resets
+    assert "in progress" in budget.try_start(day2 + 300)  # that run never reports finishing...
+    assert budget.try_start(day2 + 601) is None  # ...so it stops blocking after max_run_s
+
+
+def test_app_password_gate_and_deployed_defaults():
+    from streamlit.testing.v1 import AppTest
+
+    local = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60).run()
+    assert not local.exception and not local.text_input  # no secret: no gate
+    assert "my_company" in local.selectbox[0].options and not local.toggle[0].value
+
+    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60)
+    app.secrets["APP_PASSWORD"] = "open sesame"
+    app.run()
+    assert app.text_input[0].label == "Password" and not app.selectbox  # nothing else rendered
+    app.text_input[0].input("wrong").run()
+    assert app.error and not app.selectbox
+    app.text_input[0].input("open sesame").run()
+    assert not app.exception and not app.text_input
+    assert app.selectbox[0].options == ["sample"]  # my_company hidden when deployed
+    assert app.toggle[0].value  # opens on the backup run
+    assert any("Live runs left today" in c.value for c in app.sidebar.caption)
+
+    # Daily limit reached: Run shows a message pointing to the backup and never calls the API.
+    import json
+    import time
+
+    budget_file = ROOT / "output" / "run_budget.json"
+    saved = budget_file.read_text() if budget_file.exists() else None
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    budget_file.write_text(json.dumps({"day": today, "runs": 10, "last_start": 0, "running_since": 0}))
+    try:
+        app.toggle[0].set_value(False).run()
+        app.button[0].click().run()
+        assert any("daily limit" in w.value and "Load backup run" in w.value for w in app.warning)
+        assert not app.exception and not app.status  # the run never started
+    finally:
+        budget_file.write_text(saved) if saved is not None else budget_file.unlink()
+
+
 def _make_pdf(path: Path, pages: list[str]) -> None:
     import pymupdf as fitz
 
@@ -190,7 +245,10 @@ if __name__ == "__main__":
 
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
-               test_draft_streams_and_falls_back, test_real_style_pack_long_pdf_hijri):
+               test_draft_streams_and_falls_back, test_run_budget_limits_live_runs,
+               test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
             fn(Path(d))
             print("PASS", fn.__name__)
+    test_app_password_gate_and_deployed_defaults()
+    print("PASS test_app_password_gate_and_deployed_defaults")
