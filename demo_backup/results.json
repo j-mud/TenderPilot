@@ -1,0 +1,2008 @@
+{
+  "generated_on": "2026-10-30",
+  "ranking": [
+    {
+      "tender_id": "T101_citizen_ai_assistant",
+      "decision": "BID",
+      "fit_score": 86,
+      "blockers": []
+    },
+    {
+      "tender_id": "T104_archive_digitization_ar",
+      "decision": "CONDITIONAL_BID",
+      "fit_score": 80,
+      "blockers": [
+        "R6: The Zakat certificate (ZATCA-ZK-55821) expires on 2026-12-05, before the 2026-12-10 deadline. It must be renewed and a certificate valid on the submission date obtained before bidding. Today is 2026-10-30, so start the renewal now."
+      ]
+    },
+    {
+      "tender_id": "T102_smart_city_platform",
+      "decision": "NO_BID",
+      "fit_score": 22,
+      "blockers": [
+        "R7: no CMMI Level 3 (Development) appraisal is held (certifications.json lists CMMI as not held). This is a disqualification without technical evaluation and cannot realistically be fixed before the deadline.",
+        "R2: the Zakat certificate expires on 2026-12-05, before the 2026-12-15 deadline. It must be renewed before submission. This is fixable and alone would justify a CONDITIONAL_BID.",
+        "R16: the company does not do IoT installation or field sensor networks (profile.md). A qualified installation subcontractor must be identified and named in the bid, and none is documented in the company files."
+      ]
+    },
+    {
+      "tender_id": "T103_radiology_ai",
+      "decision": "NO_BID",
+      "fit_score": 5,
+      "blockers": [
+        "R5: SFDA Medical Device Marketing Authorization is not held, and a product authorization cannot be obtained before the deadline.",
+        "R6: ISO 13485 is not held, and the company is not a medical device manufacturer or authorized representative.",
+        "R7: The company has 7 years of operation and no healthcare IT experience, against a required 10 years of healthcare IT delivery in the Kingdom.",
+        "R12: Supplying an AI triage medical device is outside the company's scope (profile.md: no medical devices or clinical software)."
+      ]
+    },
+    {
+      "tender_id": "T105_school_construction",
+      "decision": "NO_BID",
+      "fit_score": 2,
+      "blockers": [
+        "R7: No contractor classification in Buildings (Grade 3+). The company holds no construction classification of any grade, and it cannot be obtained before the deadline.",
+        "R12: No completed school or public-building projects above SAR 15 million. Past projects are all software/AI projects, with a maximum of SAR 4.8 million.",
+        "R1: Civil, structural, MEP and finishing works are outside the company's scope (profile.md: no construction or civil works). It has no civil engineers or site staff.",
+        "R4: Site supervision and handover of construction works are outside the company's scope and capability, since it has no construction site staff."
+      ]
+    }
+  ],
+  "extractions": {
+    "T105_school_construction": {
+      "tender_id": "T105_school_construction",
+      "title": "Construction of a 24-classroom secondary school, including smart classroom cabling",
+      "issuer": "Education Infrastructure Program (fictional)",
+      "deadline": "2026-11-30",
+      "deadline_original": "2026-11-30",
+      "estimated_value_sar": 28000000.0,
+      "summary": "Tender T105-2026 invites bids to construct a two-storey, 24-classroom secondary school, including civil, structural, MEP and finishing works, plus network cabling and smart-board installation in all classrooms. The estimated budget is SAR 28,000,000 over a 20-month contract, with a submission deadline of 2026-11-30. Award is to the lowest compliant price, and bidders must hold a Grade 3+ Buildings classification, valid corporate certificates and three completed projects above SAR 15 million.",
+      "requirements": [
+        {
+          "id": "R1",
+          "category": "technical",
+          "text": "Perform civil, structural, MEP and finishing works for a two-storey school building (24-classroom secondary school).",
+          "mandatory": true,
+          "source": "Section 1.1"
+        },
+        {
+          "id": "R2",
+          "category": "technical",
+          "text": "Install network cabling in all classrooms.",
+          "mandatory": true,
+          "source": "Section 1.2"
+        },
+        {
+          "id": "R3",
+          "category": "technical",
+          "text": "Install smart boards in all classrooms.",
+          "mandatory": true,
+          "source": "Section 1.2"
+        },
+        {
+          "id": "R4",
+          "category": "technical",
+          "text": "Provide site supervision and handover of the completed works.",
+          "mandatory": true,
+          "source": "Section 1.3"
+        },
+        {
+          "id": "R5",
+          "category": "timeline",
+          "text": "Complete the contract within 20 months.",
+          "mandatory": true,
+          "source": "Contract duration (header)"
+        },
+        {
+          "id": "R6",
+          "category": "timeline",
+          "text": "Submit the bid by the submission deadline of 2026-11-30.",
+          "mandatory": true,
+          "source": "Submission deadline (header)"
+        },
+        {
+          "id": "R7",
+          "category": "eligibility",
+          "text": "Hold a contractor classification in Buildings, Grade 3 or higher.",
+          "mandatory": true,
+          "source": "Section 2.1"
+        },
+        {
+          "id": "R8",
+          "category": "document",
+          "text": "Provide a valid Commercial Registration (CR) certificate.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R9",
+          "category": "document",
+          "text": "Provide a valid Zakat certificate.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R10",
+          "category": "document",
+          "text": "Provide a valid GOSI (social insurance) certificate.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R11",
+          "category": "document",
+          "text": "Provide a valid Nitaqat (Saudization) certificate.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R12",
+          "category": "eligibility",
+          "text": "Demonstrate at least three completed school or public-building projects, each above SAR 15 million.",
+          "mandatory": true,
+          "source": "Section 2.3"
+        },
+        {
+          "id": "R13",
+          "category": "financial",
+          "text": "Submit a price offer; award is based on the lowest compliant price, so the bid must be fully compliant and price-competitive within the estimated budget of SAR 28,000,000.",
+          "mandatory": true,
+          "source": "Section 3 and Estimated budget (header)"
+        }
+      ]
+    },
+    "T103_radiology_ai": {
+      "tender_id": "T103_radiology_ai",
+      "title": "AI-assisted radiology triage system",
+      "issuer": "Central Specialist Hospital Cluster (fictional)",
+      "deadline": "2026-11-25",
+      "deadline_original": "2026-11-25, 13:00 Riyadh time",
+      "estimated_value_sar": 7200000.0,
+      "summary": "The Central Specialist Hospital Cluster seeks an AI system that reads chest X-rays and CT scans, flags urgent findings and prioritizes the radiologist worklist. The 24-month contract covers supply of an AI triage software medical device integrated with PACS and RIS, clinical validation on local data, and staff training. The estimated budget is SAR 7,200,000, and proposals are evaluated 70% on technical and 30% on financial criteria.",
+      "requirements": [
+        {
+          "id": "R1",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Commercial Registration certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R2",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Zakat certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R3",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid GOSI certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R4",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Nitaqat certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R5",
+          "category": "eligibility",
+          "text": "The proposed software must hold a valid SFDA Medical Device Marketing Authorization (MDMA).",
+          "mandatory": true,
+          "source": "Section 3.2"
+        },
+        {
+          "id": "R6",
+          "category": "eligibility",
+          "text": "The manufacturer or its authorized representative must hold ISO 13485 certification.",
+          "mandatory": true,
+          "source": "Section 3.3"
+        },
+        {
+          "id": "R7",
+          "category": "eligibility",
+          "text": "Bidder must have at least ten (10) years of experience delivering healthcare IT solutions in the Kingdom.",
+          "mandatory": true,
+          "source": "Section 3.4"
+        },
+        {
+          "id": "R8",
+          "category": "technical",
+          "text": "The solution must integrate with PACS using DICOM.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R9",
+          "category": "technical",
+          "text": "The solution must integrate with PACS using HL7/FHIR.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R10",
+          "category": "technical",
+          "text": "The solution must achieve sensitivity of at least 95% on critical findings in clinical validation.",
+          "mandatory": true,
+          "source": "Section 4.2"
+        },
+        {
+          "id": "R11",
+          "category": "technical",
+          "text": "The solution must be hosted inside the Kingdom of Saudi Arabia.",
+          "mandatory": true,
+          "source": "Section 4.3"
+        },
+        {
+          "id": "R12",
+          "category": "technical",
+          "text": "Bidder must supply an AI triage software medical device that reads chest X-rays and CT scans, flags urgent findings and prioritizes the radiologist worklist.",
+          "mandatory": true,
+          "source": "Sections 1 and 2.1"
+        },
+        {
+          "id": "R13",
+          "category": "technical",
+          "text": "The supplied software must be integrated with the hospital's PACS and RIS.",
+          "mandatory": true,
+          "source": "Section 2.1"
+        },
+        {
+          "id": "R14",
+          "category": "technical",
+          "text": "Bidder must perform clinical validation of the system on local data.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R15",
+          "category": "other",
+          "text": "Bidder must provide training for radiologists and technicians.",
+          "mandatory": true,
+          "source": "Section 2.3"
+        },
+        {
+          "id": "R16",
+          "category": "timeline",
+          "text": "Proposal must be submitted by 2026-11-25, 13:00 Riyadh time.",
+          "mandatory": true,
+          "source": "Header (Submission deadline)"
+        },
+        {
+          "id": "R17",
+          "category": "timeline",
+          "text": "The contract duration is 24 months, and the bidder must be able to deliver within this period.",
+          "mandatory": true,
+          "source": "Header (Contract duration)"
+        },
+        {
+          "id": "R18",
+          "category": "financial",
+          "text": "Bidder must submit a financial proposal, which is weighted 30% in evaluation (estimated budget SAR 7,200,000).",
+          "mandatory": true,
+          "source": "Header and Section 5"
+        }
+      ]
+    },
+    "T102_smart_city_platform": {
+      "tender_id": "T102_smart_city_platform",
+      "title": "AI analytics platform for smart city operations",
+      "issuer": "Northern Region Development Authority (fictional)",
+      "deadline": "2026-12-15",
+      "deadline_original": "2026-12-15, 13:00 Riyadh time",
+      "estimated_value_sar": 9000000.0,
+      "summary": "The Northern Region Development Authority seeks an AI analytics platform for its smart city operations center, combining traffic, utilities and citizen-report data into dashboards and predictive alerts. The contract runs 24 months with an estimated budget of SAR 9,000,000. Appendix B adds a mandatory CMMI Level 3 requirement (disqualification without technical evaluation if missing) and a requirement to supply and install 120 roadside IoT sensors or name an installation subcontractor.",
+      "requirements": [
+        {
+          "id": "R1",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Commercial Registration.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R2",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Zakat certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R3",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid GOSI certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R4",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Nitaqat certificate.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R5",
+          "category": "eligibility",
+          "text": "Bidder must hold ISO/IEC 27001 certification.",
+          "mandatory": true,
+          "source": "Section 3.2"
+        },
+        {
+          "id": "R6",
+          "category": "eligibility",
+          "text": "Bidder must achieve a minimum local content score of 35%.",
+          "mandatory": true,
+          "source": "Section 3.3"
+        },
+        {
+          "id": "R7",
+          "category": "eligibility",
+          "text": "Bidder must hold an active CMMI Level 3 (Development) or higher appraisal at the time of submission; bids without it will be disqualified without technical evaluation.",
+          "mandatory": true,
+          "source": "Appendix B.1"
+        },
+        {
+          "id": "R8",
+          "category": "technical",
+          "text": "Bidder must have delivered at least one data platform or dashboard project for a government entity in the last five years.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R9",
+          "category": "technical",
+          "text": "The solution must be hosted inside the Kingdom of Saudi Arabia.",
+          "mandatory": true,
+          "source": "Section 4.2"
+        },
+        {
+          "id": "R10",
+          "category": "technical",
+          "text": "The solution should have an Arabic-first user interface.",
+          "mandatory": false,
+          "source": "Section 4.3"
+        },
+        {
+          "id": "R11",
+          "category": "technical",
+          "text": "Provide a data platform that ingests data from existing city systems via APIs and files.",
+          "mandatory": true,
+          "source": "Section 2, item 1"
+        },
+        {
+          "id": "R12",
+          "category": "technical",
+          "text": "Provide predictive analytics for traffic congestion and utility faults.",
+          "mandatory": true,
+          "source": "Section 2, item 2"
+        },
+        {
+          "id": "R13",
+          "category": "technical",
+          "text": "Provide executive dashboards in Arabic and English.",
+          "mandatory": true,
+          "source": "Section 2, item 3"
+        },
+        {
+          "id": "R14",
+          "category": "other",
+          "text": "Deliver training for 40 operations staff.",
+          "mandatory": true,
+          "source": "Section 2, item 4"
+        },
+        {
+          "id": "R15",
+          "category": "technical",
+          "text": "Integrate with the traffic management system, water utility SCADA exports (read-only CSV) and the citizen reporting app.",
+          "mandatory": true,
+          "source": "Appendix A"
+        },
+        {
+          "id": "R16",
+          "category": "technical",
+          "text": "Supply and install 120 roadside IoT sensors, or name a qualified installation subcontractor in the bid.",
+          "mandatory": true,
+          "source": "Appendix B.2"
+        },
+        {
+          "id": "R17",
+          "category": "document",
+          "text": "Submit a technical proposal.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R18",
+          "category": "document",
+          "text": "Submit a financial proposal.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R19",
+          "category": "financial",
+          "text": "Provide a bid bond of 2% of bid value.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R20",
+          "category": "document",
+          "text": "Submit a compliance matrix as per Appendix B.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R21",
+          "category": "timeline",
+          "text": "Submit the bid by 2026-12-15, 13:00 Riyadh time.",
+          "mandatory": true,
+          "source": "Submission deadline (header)"
+        },
+        {
+          "id": "R22",
+          "category": "timeline",
+          "text": "Complete the contract within a 24-month duration.",
+          "mandatory": true,
+          "source": "Contract duration (header)"
+        }
+      ]
+    },
+    "T104_archive_digitization_ar": {
+      "tender_id": "T104_archive_digitization_ar",
+      "title": "Archive digitization and AI data extraction (رقمنة الأرشيف الورقي واستخراج البيانات بالذكاء الاصطناعي)",
+      "issuer": "Eastern Region Municipality (fictional) — أمانة المنطقة الشرقية الوهمية",
+      "deadline": "2026-12-10",
+      "deadline_original": "2026-12-10، الساعة 13:00",
+      "estimated_value_sar": 3800000.0,
+      "summary": "The Eastern Region Municipality (fictional) seeks a contractor to scan 2.5 million pages of municipal documents, apply Arabic OCR (printed and handwritten), extract metadata, and deliver an Arabic internal search portal. The estimated budget is SAR 3.8 million over 10 months, evaluated 60% technical and 40% financial. Bids are due 2026-12-10 at 13:00 with a 2% bid bond valid for 90 days.",
+      "requirements": [
+        {
+          "id": "R1",
+          "category": "technical",
+          "text": "Scan 2.5 million pages of municipal documents (title deeds, building permits, transactions).",
+          "mandatory": true,
+          "source": "Section 1.1"
+        },
+        {
+          "id": "R2",
+          "category": "technical",
+          "text": "Perform Arabic OCR on printed text and handwritten text.",
+          "mandatory": true,
+          "source": "Section 1.2"
+        },
+        {
+          "id": "R3",
+          "category": "technical",
+          "text": "Extract metadata from documents: transaction number, date, owner name, and plot number.",
+          "mandatory": true,
+          "source": "Section 1.3"
+        },
+        {
+          "id": "R4",
+          "category": "technical",
+          "text": "Deliver an internal Arabic-language search portal.",
+          "mandatory": true,
+          "source": "Section 1.4"
+        },
+        {
+          "id": "R5",
+          "category": "eligibility",
+          "text": "Hold a valid commercial registration (CR).",
+          "mandatory": true,
+          "source": "Section 2.1"
+        },
+        {
+          "id": "R6",
+          "category": "eligibility",
+          "text": "Hold a Zakat certificate that is valid on the bid submission date.",
+          "mandatory": true,
+          "source": "Section 2.2"
+        },
+        {
+          "id": "R7",
+          "category": "eligibility",
+          "text": "Hold a valid GOSI (social insurance) certificate.",
+          "mandatory": true,
+          "source": "Section 2.3"
+        },
+        {
+          "id": "R8",
+          "category": "eligibility",
+          "text": "Hold a valid Nitaqat certificate in the Green band or higher.",
+          "mandatory": true,
+          "source": "Section 2.4"
+        },
+        {
+          "id": "R9",
+          "category": "eligibility",
+          "text": "Hold a Chamber of Commerce membership certificate.",
+          "mandatory": true,
+          "source": "Section 2.5"
+        },
+        {
+          "id": "R10",
+          "category": "eligibility",
+          "text": "Achieve a local content ratio of at least 30%.",
+          "mandatory": true,
+          "source": "Section 2.6"
+        },
+        {
+          "id": "R11",
+          "category": "technical",
+          "text": "Have completed at least one digitization project of no fewer than 1 million pages within the last five years.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R12",
+          "category": "technical",
+          "text": "Achieve Arabic printed-text recognition accuracy of at least 95%.",
+          "mandatory": true,
+          "source": "Section 3.2"
+        },
+        {
+          "id": "R13",
+          "category": "technical",
+          "text": "Host all data within the Kingdom of Saudi Arabia.",
+          "mandatory": true,
+          "source": "Section 3.3"
+        },
+        {
+          "id": "R14",
+          "category": "technical",
+          "text": "Comply with the Personal Data Protection Law (PDPL).",
+          "mandatory": true,
+          "source": "Section 3.4"
+        },
+        {
+          "id": "R15",
+          "category": "document",
+          "text": "Submit a detailed project work plan with timeline.",
+          "mandatory": true,
+          "source": "Section 3.5"
+        },
+        {
+          "id": "R16",
+          "category": "financial",
+          "text": "Provide a bank guarantee (bid bond) equal to 2% of the bid value, valid for 90 days.",
+          "mandatory": true,
+          "source": "Section 5"
+        },
+        {
+          "id": "R17",
+          "category": "timeline",
+          "text": "Submit the bid by 2026-12-10 at 13:00.",
+          "mandatory": true,
+          "source": "Tender header"
+        },
+        {
+          "id": "R18",
+          "category": "timeline",
+          "text": "Complete the contract within 10 months.",
+          "mandatory": true,
+          "source": "Tender header (contract duration)"
+        },
+        {
+          "id": "R19",
+          "category": "financial",
+          "text": "Submit separate technical and financial proposals, which are evaluated at 60% and 40% weights respectively.",
+          "mandatory": true,
+          "source": "Section 4"
+        }
+      ]
+    },
+    "T101_citizen_ai_assistant": {
+      "tender_id": "T101_citizen_ai_assistant",
+      "title": "Design, build and operate a bilingual AI virtual assistant for citizen services",
+      "issuer": "General Authority for Citizen Services (fictional)",
+      "deadline": "2026-12-01",
+      "deadline_original": "2026-12-01, 13:00 Riyadh time",
+      "estimated_value_sar": 6500000.0,
+      "summary": "The General Authority for Citizen Services seeks a bilingual (Arabic/English) AI virtual assistant for its web portal, mobile app and WhatsApp, handling about 400,000 enquiries per month with handover to human agents. The contract runs 18 months (12 months build, 6 months operation) with an estimated budget of SAR 6.5M. Bidders must meet strict eligibility, experience, hosting and security requirements, and submit separate technical and financial envelopes with a bid bond and compliance matrix.",
+      "requirements": [
+        {
+          "id": "R1",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Commercial Registration.",
+          "mandatory": true,
+          "source": "Section 3.1"
+        },
+        {
+          "id": "R2",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Zakat certificate from ZATCA.",
+          "mandatory": true,
+          "source": "Section 3.2"
+        },
+        {
+          "id": "R3",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid GOSI certificate.",
+          "mandatory": true,
+          "source": "Section 3.3"
+        },
+        {
+          "id": "R4",
+          "category": "eligibility",
+          "text": "Bidder must hold a valid Saudization (Nitaqat) certificate.",
+          "mandatory": true,
+          "source": "Section 3.4"
+        },
+        {
+          "id": "R5",
+          "category": "eligibility",
+          "text": "Bidder must hold ISO/IEC 27001 certification that is valid at the time of submission.",
+          "mandatory": true,
+          "source": "Section 3.5"
+        },
+        {
+          "id": "R6",
+          "category": "eligibility",
+          "text": "Bidder must achieve a minimum local content score of 40%, certified by LCGPA.",
+          "mandatory": true,
+          "source": "Section 3.6"
+        },
+        {
+          "id": "R7",
+          "category": "technical",
+          "text": "Bidder must have delivered at least two conversational AI projects in the last five years.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R8",
+          "category": "technical",
+          "text": "Each of the two referenced conversational AI projects must be valued above SAR 2,000,000.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R9",
+          "category": "document",
+          "text": "Past conversational AI projects must be supported by client reference letters.",
+          "mandatory": true,
+          "source": "Section 4.1"
+        },
+        {
+          "id": "R10",
+          "category": "technical",
+          "text": "All data, models and logs must be hosted inside the Kingdom of Saudi Arabia.",
+          "mandatory": true,
+          "source": "Section 4.2"
+        },
+        {
+          "id": "R11",
+          "category": "technical",
+          "text": "The solution must comply with NCA Essential Cybersecurity Controls (ECC).",
+          "mandatory": true,
+          "source": "Section 4.3"
+        },
+        {
+          "id": "R12",
+          "category": "technical",
+          "text": "Personal data processing must comply with the Personal Data Protection Law (PDPL).",
+          "mandatory": true,
+          "source": "Section 4.4"
+        },
+        {
+          "id": "R13",
+          "category": "technical",
+          "text": "The proposed project manager must hold PMP or an equivalent certification.",
+          "mandatory": true,
+          "source": "Section 4.5"
+        },
+        {
+          "id": "R14",
+          "category": "technical",
+          "text": "The solution must provide human handover with full conversation context.",
+          "mandatory": true,
+          "source": "Section 4.6"
+        },
+        {
+          "id": "R15",
+          "category": "technical",
+          "text": "Deliver a conversational AI assistant on the web portal, mobile app and WhatsApp.",
+          "mandatory": true,
+          "source": "Section 2, item 1"
+        },
+        {
+          "id": "R16",
+          "category": "technical",
+          "text": "The assistant must support Arabic (Modern Standard Arabic and Saudi dialects) and English.",
+          "mandatory": true,
+          "source": "Section 2, item 2"
+        },
+        {
+          "id": "R17",
+          "category": "technical",
+          "text": "Integrate the assistant with the Authority's case-management system via REST APIs.",
+          "mandatory": true,
+          "source": "Section 2, item 3"
+        },
+        {
+          "id": "R18",
+          "category": "technical",
+          "text": "Provide an admin console for content updates.",
+          "mandatory": true,
+          "source": "Section 2, item 4"
+        },
+        {
+          "id": "R19",
+          "category": "technical",
+          "text": "Provide an analytics dashboard.",
+          "mandatory": true,
+          "source": "Section 2, item 4"
+        },
+        {
+          "id": "R20",
+          "category": "technical",
+          "text": "Provide six months of operation and support after go-live.",
+          "mandatory": true,
+          "source": "Section 2, item 5"
+        },
+        {
+          "id": "R21",
+          "category": "technical",
+          "text": "Maintain 99.5% availability during the operation and support period.",
+          "mandatory": true,
+          "source": "Section 2, item 5"
+        },
+        {
+          "id": "R22",
+          "category": "technical",
+          "text": "The assistant must understand at minimum the Najdi dialect.",
+          "mandatory": true,
+          "source": "Appendix A"
+        },
+        {
+          "id": "R23",
+          "category": "technical",
+          "text": "The assistant must understand at minimum the Hijazi dialect.",
+          "mandatory": true,
+          "source": "Appendix A"
+        },
+        {
+          "id": "R24",
+          "category": "technical",
+          "text": "The assistant should support Gulf dialects.",
+          "mandatory": false,
+          "source": "Appendix A"
+        },
+        {
+          "id": "R25",
+          "category": "technical",
+          "text": "The assistant should support Southern dialects.",
+          "mandatory": false,
+          "source": "Appendix A"
+        },
+        {
+          "id": "R26",
+          "category": "timeline",
+          "text": "Complete the build within 12 months, followed by 6 months of operation (18-month contract total).",
+          "mandatory": true,
+          "source": "Header (Contract duration); Section 2, item 5"
+        },
+        {
+          "id": "R27",
+          "category": "timeline",
+          "text": "Submit the proposal by 2026-12-01 at 13:00 Riyadh time.",
+          "mandatory": true,
+          "source": "Header (Submission deadline)"
+        },
+        {
+          "id": "R28",
+          "category": "timeline",
+          "text": "Submit any clarification questions by 2026-11-15.",
+          "mandatory": false,
+          "source": "Header (Questions deadline)"
+        },
+        {
+          "id": "R29",
+          "category": "document",
+          "text": "Submit the technical proposal in a separate envelope from the financial proposal.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R30",
+          "category": "document",
+          "text": "Submit the financial proposal in a separate envelope from the technical proposal.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R31",
+          "category": "financial",
+          "text": "Provide a bid bond of 1% of the bid value, valid for 90 days.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R32",
+          "category": "document",
+          "text": "Provide a compliance matrix responding to every requirement in Sections 3 and 4.",
+          "mandatory": true,
+          "source": "Section 6"
+        },
+        {
+          "id": "R33",
+          "category": "other",
+          "text": "Technical proposal must score at least 65% in the technical evaluation to pass (technical weighted 70%: experience 25%, methodology 25%, team 20%; financial 30%).",
+          "mandatory": true,
+          "source": "Section 5"
+        }
+      ]
+    }
+  },
+  "qualifications": {
+    "T105_school_construction": {
+      "tender_id": "T105_school_construction",
+      "fit_score": 2,
+      "decision": "NO_BID",
+      "reasons": [
+        "The tender is primarily a construction contract (civil, structural, MEP and finishing works for a 24-classroom school), which is outside Falak AI Solutions' scope. The company profile states it does not do construction or civil works.",
+        "The company holds no contractor classification in any grade, and certifications.json lists it under not_held. A Grade 3+ Buildings classification cannot realistically be obtained before 2026-11-30.",
+        "The company has no completed school or public-building construction projects. Its largest past project is SAR 4.8 million, against a requirement of three projects above SAR 15 million.",
+        "The estimated value of SAR 28 million far exceeds the company's comfortable maximum project size of SAR 10 million and its FY2025 revenue of SAR 18 million.",
+        "Team files confirm there are no civil engineers or construction site staff. Award goes to the lowest compliant price, so a non-compliant bid has no realistic chance.",
+        "Corporate certificates (CR, Zakat, GOSI, Nitaqat) are valid on the deadline, but they do not offset the eligibility and scope gaps. The Zakat certificate expires 2026-12-05, shortly after the deadline, so it should be renewed if the company bids on other tenders."
+      ],
+      "blockers": [
+        "R7: No contractor classification in Buildings (Grade 3+). The company holds no construction classification of any grade, and it cannot be obtained before the deadline.",
+        "R12: No completed school or public-building projects above SAR 15 million. Past projects are all software/AI projects, with a maximum of SAR 4.8 million.",
+        "R1: Civil, structural, MEP and finishing works are outside the company's scope (profile.md: no construction or civil works). It has no civil engineers or site staff.",
+        "R4: Site supervision and handover of construction works are outside the company's scope and capability, since it has no construction site staff."
+      ],
+      "checks": [
+        {
+          "requirement_id": "R1",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "Construction and civil works are explicitly outside the company's scope, and team.md lists no civil engineers or site staff."
+        },
+        {
+          "requirement_id": "R2",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company does not do IoT device installation or field networks, and no cabling installation experience is evidenced."
+        },
+        {
+          "requirement_id": "R3",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "Hardware and device installation are not company activities, and no smart-board installation experience is evidenced."
+        },
+        {
+          "requirement_id": "R4",
+          "status": "gap",
+          "evidence": "team.md",
+          "note": "No construction site staff are available for site supervision and handover of building works."
+        },
+        {
+          "requirement_id": "R5",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company cannot commit to delivering a 20-month construction contract, as construction is outside its scope."
+        },
+        {
+          "requirement_id": "R6",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Downgraded by guardrail: no company file cited. The deadline of 2026-11-30 is 31 days away, so a submission is feasible, but this does not address eligibility."
+        },
+        {
+          "requirement_id": "R7",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "Contractor classification for construction works (any grade) is listed under not_held."
+        },
+        {
+          "requirement_id": "R8",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "CR-1010-XXXXXX is valid until 2027-08-14, after the deadline."
+        },
+        {
+          "requirement_id": "R9",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The Zakat certificate is valid until 2026-12-05, after the deadline, but expires only 5 days later, so it should be renewed promptly."
+        },
+        {
+          "requirement_id": "R10",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The GOSI certificate is valid until 2027-01-31, after the deadline."
+        },
+        {
+          "requirement_id": "R11",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The Nitaqat certificate (Platinum) is valid until 2027-03-01, after the deadline."
+        },
+        {
+          "requirement_id": "R12",
+          "status": "gap",
+          "evidence": "past_projects.md",
+          "note": "None of the five past projects is a school or public-building construction project, and the largest is SAR 4.8 million, against a requirement of three above SAR 15 million."
+        },
+        {
+          "requirement_id": "R13",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company cannot submit a fully compliant bid, and SAR 28 million exceeds its comfortable maximum of SAR 10 million."
+        }
+      ]
+    },
+    "T103_radiology_ai": {
+      "tender_id": "T103_radiology_ai",
+      "fit_score": 5,
+      "decision": "NO_BID",
+      "reasons": [
+        "The tender requires a regulated AI triage software medical device. profile.md says the company does not do medical devices, clinical software or healthcare-regulated products.",
+        "The company holds neither SFDA MDMA nor ISO 13485, and both are mandatory eligibility items. Neither can realistically be obtained before 2026-11-25, about 26 days away.",
+        "The company was founded in 2019 (7 years) and has no healthcare IT projects. It cannot show the required 10 years of healthcare IT experience in the Kingdom.",
+        "team.md lists no clinical staff and no licensed medical-device engineers, so clinical validation on local data is beyond current capability.",
+        "The company meets the corporate eligibility certificates (CR, Zakat, GOSI, Nitaqat) and offers in-Kingdom hosting. The SAR 7.2M value is within its SAR 10M comfortable project size. These points do not offset the regulatory and domain gaps."
+      ],
+      "blockers": [
+        "R5: SFDA Medical Device Marketing Authorization is not held, and a product authorization cannot be obtained before the deadline.",
+        "R6: ISO 13485 is not held, and the company is not a medical device manufacturer or authorized representative.",
+        "R7: The company has 7 years of operation and no healthcare IT experience, against a required 10 years of healthcare IT delivery in the Kingdom.",
+        "R12: Supplying an AI triage medical device is outside the company's scope (profile.md: no medical devices or clinical software)."
+      ],
+      "checks": [
+        {
+          "requirement_id": "R1",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Commercial Registration is valid until 2027-08-14."
+        },
+        {
+          "requirement_id": "R2",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Zakat certificate is valid until 2026-12-05, which is after the deadline, but it expires soon after and should be renewed."
+        },
+        {
+          "requirement_id": "R3",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "GOSI certificate is valid until 2027-01-31."
+        },
+        {
+          "requirement_id": "R4",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Nitaqat certificate (Platinum) is valid until 2027-03-01."
+        },
+        {
+          "requirement_id": "R5",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "SFDA MDMA is listed under not_held, and the company does not make medical devices."
+        },
+        {
+          "requirement_id": "R6",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "ISO 13485 is listed under not_held."
+        },
+        {
+          "requirement_id": "R7",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company was founded in 2019 (7 years), and past_projects.md shows no healthcare IT projects."
+        },
+        {
+          "requirement_id": "R8",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No evidence of DICOM or PACS integration in the files, and this is in the medical imaging domain, which is outside scope."
+        },
+        {
+          "requirement_id": "R9",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No evidence of HL7/FHIR integration with PACS in the company files."
+        },
+        {
+          "requirement_id": "R10",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No medical imaging AI product or validation results exist; P3 covers Arabic OCR only."
+        },
+        {
+          "requirement_id": "R11",
+          "status": "met",
+          "evidence": "profile.md",
+          "note": "All production workloads run in in-Kingdom data centers (Riyadh and Jeddah); P2 was also hosted in-Kingdom."
+        },
+        {
+          "requirement_id": "R12",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company states it does not do medical devices or clinical software, and it has no radiology AI product."
+        },
+        {
+          "requirement_id": "R13",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No PACS/RIS integration experience is documented; P2 integrated only with a case-management system."
+        },
+        {
+          "requirement_id": "R14",
+          "status": "gap",
+          "evidence": "team.md",
+          "note": "The company has no clinical staff or medical-device engineers to run clinical validation on local data."
+        },
+        {
+          "requirement_id": "R15",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No evidence of radiologist or technician training; the company has no clinical domain staff."
+        },
+        {
+          "requirement_id": "R16",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality; the deadline is 2026-11-25 13:00 Riyadh time, 26 days from today, but a bid is not advisable."
+        },
+        {
+          "requirement_id": "R17",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No evidence that a 24-month healthcare delivery is feasible; this is a delivery commitment and depends on the out-of-scope product."
+        },
+        {
+          "requirement_id": "R18",
+          "status": "unknown",
+          "evidence": "profile.md",
+          "note": "The financial proposal is a formality. SAR 7.2M is within the SAR 10M comfortable project size, but pricing cannot be derived from the files."
+        }
+      ]
+    },
+    "T104_archive_digitization_ar": {
+      "tender_id": "T104_archive_digitization_ar",
+      "fit_score": 80,
+      "decision": "CONDITIONAL_BID",
+      "reasons": [
+        "The work is core to Falak AI's business: Arabic OCR (printed and handwritten), document digitization and Arabic search portals (profile.md, P3).",
+        "P3 (2022–2023, 1.8M pages, SAR 2.1M, reference letter available) satisfies the R11 experience threshold of at least 1M pages within five years.",
+        "P3 reports 97.1% character accuracy on printed Arabic, above the 95% threshold. It also reports 89% on handwritten text, but the tender sets no handwritten threshold.",
+        "All eligibility certificates except Zakat are valid on 2026-12-10: CR, GOSI, Nitaqat (Platinum), Chamber of Commerce. Local content is 52% against a 30% minimum.",
+        "In-Kingdom hosting (Riyadh and Jeddah), NCA ECC compliance and a PDPL program with a DPO support the data-hosting and data-protection requirements.",
+        "The Zakat certificate (valid until 2026-12-05) expires five days before the deadline. This is fixable by renewal, so the bid is conditional rather than a no-bid.",
+        "The 2.5M-page volume is about 39% larger than the largest past digitization project (1.8M pages). The tender also covers title deeds and building permits. Scanning capacity and equipment are not evidenced in the files, so this is a delivery risk but not a blocker.",
+        "The tender value (SAR 3.8M) is well within the company's comfortable maximum project size (SAR 10M)."
+      ],
+      "blockers": [
+        "R6: The Zakat certificate (ZATCA-ZK-55821) expires on 2026-12-05, before the 2026-12-10 deadline. It must be renewed and a certificate valid on the submission date obtained before bidding. Today is 2026-10-30, so start the renewal now."
+      ],
+      "checks": [
+        {
+          "requirement_id": "R1",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P3 digitized 1.8M pages of Arabic documents, but the 2.5M-page scale, scanning capacity and equipment, and experience with deeds and permits are not evidenced."
+        },
+        {
+          "requirement_id": "R2",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P3 delivered Arabic OCR on printed (97.1%) and handwritten (89%) records, and profile.md lists this as a core capability."
+        },
+        {
+          "requirement_id": "R3",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P3 included metadata extraction, but extraction of the specific fields (transaction number, date, owner name, plot number) is not documented."
+        },
+        {
+          "requirement_id": "R4",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P3 delivered a search portal over Arabic documents, and team.md lists Arabic-first UX designers."
+        },
+        {
+          "requirement_id": "R5",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "CR-1010-XXXXXX is valid until 2027-08-14."
+        },
+        {
+          "requirement_id": "R6",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "The Zakat certificate expires 2026-12-05, before the 2026-12-10 deadline, so it is not valid on the submission date. Renewal is required."
+        },
+        {
+          "requirement_id": "R7",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The GOSI certificate is valid until 2027-01-31."
+        },
+        {
+          "requirement_id": "R8",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The Nitaqat certificate (Platinum band, above the Green minimum) is valid until 2027-03-01."
+        },
+        {
+          "requirement_id": "R9",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Chamber of Commerce membership is valid until 2027-02-28."
+        },
+        {
+          "requirement_id": "R10",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The certified local content score is 52% (above the 30% minimum), valid until 2027-06-30."
+        },
+        {
+          "requirement_id": "R11",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P3 (2022–2023) digitized 1.8M pages, above the 1M minimum and within five years, with a reference letter."
+        },
+        {
+          "requirement_id": "R12",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P3 achieved 97.1% character accuracy on printed Arabic; this measures character rather than word accuracy, so confirm the tender's measurement method."
+        },
+        {
+          "requirement_id": "R13",
+          "status": "met",
+          "evidence": "profile.md",
+          "note": "All production workloads are hosted in in-Kingdom data centers (Riyadh and Jeddah)."
+        },
+        {
+          "requirement_id": "R14",
+          "status": "partial",
+          "evidence": "profile.md",
+          "note": "A PDPL program and appointed DPO are stated, but no audit or certification evidence of full compliance is provided."
+        },
+        {
+          "requirement_id": "R15",
+          "status": "unknown",
+          "evidence": "",
+          "note": "The work plan is a proposal deliverable still to be prepared; the team has PMP-certified project managers (team.md)."
+        },
+        {
+          "requirement_id": "R16",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No file covers bank guarantee arrangements; a bid bond of 2% of the bid value, valid 90 days, must be arranged with the bank."
+        },
+        {
+          "requirement_id": "R17",
+          "status": "unknown",
+          "evidence": "",
+          "note": "This is a submission formality; about 41 days remain from 2026-10-30 to the 2026-12-10 13:00 deadline."
+        },
+        {
+          "requirement_id": "R18",
+          "status": "unknown",
+          "evidence": "",
+          "note": "The 10-month schedule is a delivery commitment; no file shows P3's duration, so feasibility for 2.5M pages must be assessed in the work plan."
+        },
+        {
+          "requirement_id": "R19",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Preparing separate technical and financial proposals is a submission formality; the 60/40 weighting does not depend on company files."
+        }
+      ]
+    },
+    "T102_smart_city_platform": {
+      "tender_id": "T102_smart_city_platform",
+      "fit_score": 22,
+      "decision": "NO_BID",
+      "reasons": [
+        "R7 is a mandatory CMMI Level 3 requirement. Bids without it are disqualified without technical evaluation. The company holds no CMMI appraisal at any level, and one cannot realistically be obtained before the 2026-12-15 deadline, which is about 46 days away.",
+        "The company's core strengths fit the tender well: government dashboards and data platforms (P4), in-Kingdom hosting, ISO 27001, 52% local content against the 35% minimum, and Arabic-first UX. None of this offsets the disqualifying CMMI gap.",
+        "The Zakat certificate expires on 2026-12-05, ten days before the deadline. This can be fixed by renewing it, so it is not decisive on its own.",
+        "R16 requires supplying and installing 120 IoT sensors, which the company does not do. The tender allows a named installation subcontractor, but no subcontractor appears in the company files, so one would have to be found and could not be assumed.",
+        "The SAR 9M value is within the company's comfortable maximum project size of SAR 10M, but this does not change the outcome."
+      ],
+      "blockers": [
+        "R7: no CMMI Level 3 (Development) appraisal is held (certifications.json lists CMMI as not held). This is a disqualification without technical evaluation and cannot realistically be fixed before the deadline.",
+        "R2: the Zakat certificate expires on 2026-12-05, before the 2026-12-15 deadline. It must be renewed before submission. This is fixable and alone would justify a CONDITIONAL_BID.",
+        "R16: the company does not do IoT installation or field sensor networks (profile.md). A qualified installation subcontractor must be identified and named in the bid, and none is documented in the company files."
+      ],
+      "checks": [
+        {
+          "requirement_id": "R1",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Commercial Registration CR-1010-XXXXXX is valid until 2027-08-14."
+        },
+        {
+          "requirement_id": "R2",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "Zakat certificate expires 2026-12-05, before the 2026-12-15 deadline, so it is not valid on the submission date and must be renewed."
+        },
+        {
+          "requirement_id": "R3",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "GOSI certificate is valid until 2027-01-31, after the deadline."
+        },
+        {
+          "requirement_id": "R4",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Nitaqat certificate (Platinum) is valid until 2027-03-01."
+        },
+        {
+          "requirement_id": "R5",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "ISO/IEC 27001:2022 is valid until 2027-05-30."
+        },
+        {
+          "requirement_id": "R6",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Certified local content score is 52%, above the 35% minimum, valid until 2027-06-30."
+        },
+        {
+          "requirement_id": "R7",
+          "status": "gap",
+          "evidence": "certifications.json",
+          "note": "CMMI (any level) is listed as not held; this leads to disqualification without technical evaluation."
+        },
+        {
+          "requirement_id": "R8",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P4 Municipal performance dashboard (2021–2022, municipality, SAR 1.4M, reference letter available) was a data platform and executive dashboard project for a government entity within the five-year window."
+        },
+        {
+          "requirement_id": "R9",
+          "status": "met",
+          "evidence": "profile.md",
+          "note": "All production workloads are hosted in in-Kingdom data centers (Riyadh and Jeddah); P2 was also hosted in-Kingdom."
+        },
+        {
+          "requirement_id": "R10",
+          "status": "partial",
+          "evidence": "team.md",
+          "note": "The team includes 3 Arabic-first UX designers, but no project proves an Arabic-first interface for this solution. This requirement is optional."
+        },
+        {
+          "requirement_id": "R11",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P4 delivered a data platform, but the files do not state ingestion from city systems via APIs and files."
+        },
+        {
+          "requirement_id": "R12",
+          "status": "partial",
+          "evidence": "team.md",
+          "note": "There are 9 ML/NLP engineers, but no past project shows predictive analytics for traffic congestion or utility faults."
+        },
+        {
+          "requirement_id": "R13",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P4 delivered executive dashboards and P1 was bilingual Arabic/English, but no bilingual executive dashboard project is documented."
+        },
+        {
+          "requirement_id": "R14",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No file documents delivering training to 40 operations staff; this is a delivery commitment."
+        },
+        {
+          "requirement_id": "R15",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No file shows integration with traffic management systems, SCADA CSV exports or a citizen reporting app; this is a delivery commitment."
+        },
+        {
+          "requirement_id": "R16",
+          "status": "gap",
+          "evidence": "profile.md",
+          "note": "The company does not do IoT device installation or field sensor networks, and no installation subcontractor is documented in the files."
+        },
+        {
+          "requirement_id": "R17",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: the technical proposal would be prepared for the bid."
+        },
+        {
+          "requirement_id": "R18",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: the financial proposal would be prepared for the bid."
+        },
+        {
+          "requirement_id": "R19",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: the bid bond (2% of bid value, about SAR 180,000 at the estimated value) would be arranged via a bank; no file confirms facility."
+        },
+        {
+          "requirement_id": "R20",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: the compliance matrix would be prepared, but the CMMI and IoT rows could not be answered positively."
+        },
+        {
+          "requirement_id": "R21",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: about 46 days remain from today (2026-10-30) to the 2026-12-15, 13:00 Riyadh deadline."
+        },
+        {
+          "requirement_id": "R22",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Delivery schedule commitment: no file shows a 24-month delivery plan, though prior projects ran about 1–2 years."
+        }
+      ]
+    },
+    "T101_citizen_ai_assistant": {
+      "tender_id": "T101_citizen_ai_assistant",
+      "fit_score": 86,
+      "decision": "BID",
+      "reasons": [
+        "All mandatory eligibility and capability requirements (R1-R9, R13) are proven by company files: CR, Zakat, GOSI, Nitaqat, ISO 27001 and local content 52% (above the 40% minimum) are valid on 2026-12-01.",
+        "P1 (SAR 3.2M, 2023-24) and P2 (SAR 4.8M, 2024-25) are conversational AI projects within the last five years, each above SAR 2M, and both have reference letters.",
+        "The scope matches the company's core business: P1 covered web, mobile and WhatsApp with Najdi and Hijazi dialects and human handover. P2 was a government citizen-enquiry assistant integrated with a case-management system, hosted in-Kingdom and ECC compliant.",
+        "The contract value (SAR 6.5M) is below the company's comfortable maximum of SAR 10M, and the team has 3 PMP project managers, 9 ML/NLP engineers and a 24/7 support rota.",
+        "Open items are delivery commitments or submission formalities (admin console, 99.5% SLA, bid bond, compliance matrix), not eligibility gaps. The Zakat certificate expires 2026-12-05, only 4 days after the deadline. This is a note, not a gap, but renewing it is advisable."
+      ],
+      "blockers": [],
+      "checks": [
+        {
+          "requirement_id": "R1",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Commercial Registration CR-1010-XXXXXX is valid until 2027-08-14."
+        },
+        {
+          "requirement_id": "R2",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "ZATCA Zakat certificate is valid until 2026-12-05, which is after the 2026-12-01 deadline; it expires only 4 days later, so renew it early."
+        },
+        {
+          "requirement_id": "R3",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "GOSI certificate is valid until 2027-01-31."
+        },
+        {
+          "requirement_id": "R4",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "Nitaqat certificate (Platinum band) is valid until 2027-03-01."
+        },
+        {
+          "requirement_id": "R5",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "ISO/IEC 27001:2022 is valid until 2027-05-30."
+        },
+        {
+          "requirement_id": "R6",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "The LCGPA-certified local content score is 52%, above the 40% minimum, and valid until 2027-06-30."
+        },
+        {
+          "requirement_id": "R7",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P1 (2023-24) and P2 (2024-25) are two conversational AI projects within the last five years."
+        },
+        {
+          "requirement_id": "R8",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P1 is SAR 3.2M and P2 is SAR 4.8M, both above SAR 2M."
+        },
+        {
+          "requirement_id": "R9",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "Reference letters are available for both P1 and P2."
+        },
+        {
+          "requirement_id": "R10",
+          "status": "met",
+          "evidence": "profile.md",
+          "note": "All production workloads are hosted in in-Kingdom data centers (Riyadh and Jeddah); P2 was also hosted in-Kingdom."
+        },
+        {
+          "requirement_id": "R11",
+          "status": "met",
+          "evidence": "certifications.json",
+          "note": "An ECC compliance report (ECC-2026-03) is valid until 2027-03-31, and P2 was ECC compliant."
+        },
+        {
+          "requirement_id": "R12",
+          "status": "partial",
+          "evidence": "profile.md",
+          "note": "A PDPL program and an appointed DPO are in place, but there is no certificate or audit evidence in the files."
+        },
+        {
+          "requirement_id": "R13",
+          "status": "met",
+          "evidence": "team.md",
+          "note": "The company has 3 PMP-certified project managers, one with 12 years of government experience; the named PM must be selected for the proposal."
+        },
+        {
+          "requirement_id": "R14",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P1 included handover to human agents, but passing full conversation context is not explicitly documented."
+        },
+        {
+          "requirement_id": "R15",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P1 delivered a chatbot on web, mobile and WhatsApp."
+        },
+        {
+          "requirement_id": "R16",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P1 was bilingual Arabic/English with Najdi and Hijazi support, but Modern Standard Arabic support is not explicitly stated."
+        },
+        {
+          "requirement_id": "R17",
+          "status": "partial",
+          "evidence": "past_projects.md",
+          "note": "P2 integrated with a case-management system, but the use of REST APIs is not stated."
+        },
+        {
+          "requirement_id": "R18",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No file mentions an admin console for content updates; confirm the product capability."
+        },
+        {
+          "requirement_id": "R19",
+          "status": "partial",
+          "evidence": "profile.md",
+          "note": "The company builds dashboards and analytics (P4), but no conversational AI analytics dashboard is documented."
+        },
+        {
+          "requirement_id": "R20",
+          "status": "partial",
+          "evidence": "team.md",
+          "note": "A 24/7 support and operations rota exists and P2 reported 6 months of live operation, but there is no explicit support-contract evidence."
+        },
+        {
+          "requirement_id": "R21",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No past SLA or availability record is provided for 99.5%; this is a delivery commitment to confirm."
+        },
+        {
+          "requirement_id": "R22",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P1 included Najdi dialect support."
+        },
+        {
+          "requirement_id": "R23",
+          "status": "met",
+          "evidence": "past_projects.md",
+          "note": "P1 included Hijazi dialect support."
+        },
+        {
+          "requirement_id": "R24",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Gulf dialect support is optional and not documented in the files."
+        },
+        {
+          "requirement_id": "R25",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Southern dialect support is optional and not documented in the files."
+        },
+        {
+          "requirement_id": "R26",
+          "status": "unknown",
+          "evidence": "",
+          "note": "No evidence on an 12+6 month plan; P1 and P2 show similar delivery capability, and the schedule is a proposal commitment."
+        },
+        {
+          "requirement_id": "R27",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Submission formality: about 32 days remain from 2026-10-30 to the 2026-12-01 13:00 Riyadh deadline."
+        },
+        {
+          "requirement_id": "R28",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Formality: submit any clarification questions (for example on the REST API specs and SLA) by 2026-11-15."
+        },
+        {
+          "requirement_id": "R29",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Formality: prepare the technical envelope separately."
+        },
+        {
+          "requirement_id": "R30",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Formality: prepare the financial envelope separately."
+        },
+        {
+          "requirement_id": "R31",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Formality: a bid bond of about SAR 65,000 (1% of SAR 6.5M estimate) valid 90 days; no bank guarantee facility is documented, so arrange it."
+        },
+        {
+          "requirement_id": "R32",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Formality: prepare a compliance matrix for all of Sections 3 and 4."
+        },
+        {
+          "requirement_id": "R33",
+          "status": "unknown",
+          "evidence": "",
+          "note": "Evaluation threshold: the 65% technical pass mark cannot be verified, though the experience and team evidence looks strong."
+        }
+      ]
+    }
+  },
+  "drafts": {
+    "T101_citizen_ai_assistant": {
+      "tender_id": "T101_citizen_ai_assistant",
+      "revision": 1,
+      "sections": [
+        {
+          "title": "1. Executive summary",
+          "content": "Falak AI Solutions Co. (Riyadh, founded 2019, 42 full-time employees) is pleased to respond to the General Authority for Citizen Services' tender for a bilingual (Arabic/English) AI virtual assistant for citizen services. The assistant will serve the web portal, mobile app and WhatsApp, with handover to human agents.\n\nOur core business is Arabic NLP and conversational AI, with AI model hosting in Saudi in-Kingdom cloud regions only. Two recent projects are directly comparable to this scope:\n- P1, an Arabic/English customer-service chatbot for a Saudi retail bank (SAR 3.2 million, 2023-2024). It ran on web, mobile and WhatsApp with Najdi and Hijazi dialect support and handover to human agents. 61% of conversations were resolved without an agent and CSAT was 4.4/5.\n- P2, a government services virtual assistant for a semi-government authority (SAR 4.8 million, 2024-2025). It handled citizen enquiries, was integrated with a case-management system, was hosted in-Kingdom and was NCA ECC compliant. It handled 1.2 million conversations in its first 6 months.\n\nWe hold the mandatory eligibility documents (Commercial Registration, Zakat, GOSI, Nitaqat, ISO/IEC 27001, and a 52% LCGPA-certified local content score against the 40% minimum). We also have 3 PMP-certified project managers and a 24/7 support and operations rota.\n\nThis is a first draft. Items not evidenced in our files are marked [TO CONFIRM] and listed in Section 7 for human review before submission.\n\n[TO CONFIRM: the Zakat certificate (ZATCA-ZK-55821) expires 2026-12-05, four days after the 2026-12-01 deadline. Renewal should be started before submission.]"
+        },
+        {
+          "title": "2. Understanding of requirements",
+          "content": "The Authority requires a conversational AI assistant that:\n- Is delivered on three channels: web portal, mobile app and WhatsApp (R15).\n- Supports English and Arabic, including Modern Standard Arabic and Saudi dialects. Najdi and Hijazi are mandatory; Gulf and Southern dialects are desirable (R16, R22-R25).\n- Handles about 400,000 enquiries per month, with human handover that carries full conversation context (R14).\n- Integrates with the Authority's case-management system via REST APIs (R17).\n- Includes an admin console for content updates and an analytics dashboard (R18, R19).\n- Runs for 6 months of operation and support after go-live at 99.5% availability (R20, R21).\n- Hosts all data, models and logs inside the Kingdom (R10), complies with NCA ECC (R11) and PDPL (R12), and is managed by a PMP-certified project manager (R13).\n\nThe contract runs 18 months: a 12-month build followed by 6 months of operation (R26). The estimated budget is SAR 6.5 million.\n\nAdministrative requirements:\n- Eligibility: Commercial Registration, Zakat, GOSI, Nitaqat, ISO/IEC 27001 and local content of at least 40% (R1-R6).\n- Experience: two conversational AI projects in the last five years, each above SAR 2 million, with client reference letters (R7-R9).\n- Submission: technical and financial envelopes submitted separately (R29, R30), a bid bond of 1% of bid value valid for 90 days (R31), and a compliance matrix covering Sections 3 and 4 (R32).\n- Deadlines: proposal by 2026-12-01 at 13:00 Riyadh time (R27); clarification questions by 2026-11-15 (R28).\n- Evaluation: the technical proposal must score at least 65%. Technical carries 70% (experience 25%, methodology 25%, team 20%) and financial 30% (R33).\n\nScale observation: 400,000 enquiries per month is roughly double the average monthly volume of P2 (1.2 million conversations in its first 6 months, about 200,000 per month). We have no documented evidence of performance at the Authority's target volume. [TO CONFIRM: load and capacity evidence at about 400,000 enquiries per month.]\n\nQuestions we propose to raise with the Authority before 2026-11-15 (R28):\n- The REST API specification of the case-management system.\n- The SLA definition and measurement method for 99.5% availability.\n- The expected handover context format."
+        },
+        {
+          "title": "3. Technical approach and methodology",
+          "content": "Note: this section describes our proposed approach, which is a commitment to be validated by the delivery team. It is informed by the scope and results of P1 and P2. Specific technologies, architectures and tools are not named because they are not documented in the company files. [TO CONFIRM: solution architecture, product components and technology stack to be supplied by the technical lead.]\n\nProposed phasing of the 12-month build, then 6 months of operation (R26). [TO CONFIRM: detailed 12+6 month plan and milestones; no schedule evidence exists in the files.]\n\n1. Mobilisation and discovery\n- Confirm scope, channels, enquiry categories and the case-management integration with the Authority.\n- Establish governance led by a PMP-certified project manager.\n\n2. Conversation design and language\n- Arabic-first conversation and interface design by our UX team.\n- Arabic (Modern Standard Arabic, with Najdi and Hijazi dialects) and English support, building on P1's bilingual Najdi/Hijazi delivery. [TO CONFIRM: Modern Standard Arabic support is not explicitly stated for P1 or P2.]\n- Gulf and Southern dialects are optional. [TO CONFIRM: no evidence in the files; decide whether to offer them.]\n\n3. Channels\n- Web portal, mobile app and WhatsApp, as delivered together in P1.\n\n4. Integration\n- Integration with the Authority's case-management system, building on our P2 integration with a case-management system. [TO CONFIRM: use of REST APIs is not stated in the P2 record.]\n\n5. Human handover\n- Escalation to human agents as delivered in P1. [TO CONFIRM: the transfer of full conversation context to the agent is not explicitly documented.]\n\n6. Administration and analytics\n- An admin console for content updates. [TO CONFIRM: no file documents this capability.]\n- An analytics dashboard. We have data-platform and executive-dashboard experience (P4), but no conversational AI analytics dashboard is documented. [TO CONFIRM.]\n\n7. Hosting, security and data protection\n- Hosting entirely in in-Kingdom data centres (Riyadh and Jeddah regions), covering data, models and logs (R10). [TO CONFIRM: that logs, backups and any third-party services also remain in-Kingdom.]\n- NCA ECC compliance. Our last ECC assessment was March 2026 (report ECC-2026-03), and P2 was ECC compliant.\n- PDPL: a PDPL programme and an appointed DPO are in place. [TO CONFIRM: no certificate or audit evidence in the files.]\n\n8. Testing, go-live and 6-month operation\n- 6 months of operation and support after go-live, supported by our 24/7 operations rota (6 support and operations staff). [TO CONFIRM: support-contract evidence.]\n- Target of 99.5% availability. [TO CONFIRM: no past SLA or availability record; the measurement method is to be agreed with the Authority.]"
+        },
+        {
+          "title": "4. Relevant experience",
+          "content": "Qualifying conversational AI projects (R7-R9), both within the last five years, above SAR 2,000,000, and supported by reference letters:\n\n- P1. Arabic customer-service chatbot, regional Saudi retail bank (client name withheld), 2023-2024, SAR 3.2 million. Scope: bilingual Arabic/English chatbot on web, mobile and WhatsApp, with Najdi and Hijazi dialect support and handover to human agents. Results: 61% of conversations resolved without an agent; CSAT 4.4/5. Reference letter: yes. Relevance: the same channels, dialects and handover as this tender.\n\n- P2. Government services virtual assistant, semi-government authority, 2024-2025, SAR 4.8 million. Scope: conversational AI for citizen enquiries, integrated with a case-management system, hosted in-Kingdom and NCA ECC compliant. Results: 1.2 million conversations in the first 6 months. Reference letter: yes. Relevance: the same citizen-services context, case-management integration, in-Kingdom hosting and ECC compliance.\n\nSupporting projects:\n- P3. Archive digitization and Arabic OCR, public university, 2022-2023, SAR 2.1 million. It digitised 1.8 million pages of Arabic documents and delivered a search portal. Reference letter: yes. It demonstrates Arabic language-processing depth, but is not a conversational AI project.\n- P4. Municipal performance dashboard, municipality, 2021-2022, SAR 1.4 million. It delivered a data platform and executive dashboards. Reference letter: yes. It is relevant to the analytics dashboard requirement (R19).\n\nProject P5 (contract-document classification, SAR 0.9 million, 2025) has a pending reference letter and is not relied upon.\n\n[TO CONFIRM: that the P1 and P2 reference letters are current and acceptable to the Authority, since the P1 client name is withheld. Also confirm which project figures can be disclosed.]"
+        },
+        {
+          "title": "5. Team",
+          "content": "Our team (company-wide capacity per team.md):\n- Project managers (PMP certified): 3, one with 12 years of government project experience.\n- ML / NLP engineers: 9, two of whom hold PhDs in Arabic NLP.\n- Software engineers: 14 (Python, TypeScript, cloud).\n- Data engineers: 5.\n- Cybersecurity specialists: 2, one holding CISSP.\n- UX designers: 3, with Arabic-first interface design.\n- Support and operations: 6, with a 24/7 rota available.\n\nProposed project manager (R13): one of our three PMP-certified project managers. The PMP requirement is met by the team, but the named individual is not yet selected. [TO CONFIRM: select and name the project manager, with CV, PMP certificate number and validity. The project manager with 12 years of government experience is a candidate.]\n\n[TO CONFIRM: names, CVs, roles and allocation percentages for all proposed staff across the 18-month contract, and availability alongside other commitments. The files give headcounts only.]"
+        },
+        {
+          "title": "6. Compliance statement",
+          "content": "R1: Complied. Commercial Registration CR-1010-XXXXXX, valid until 2027-08-14 (certifications.json).\nR2: Complied. ZATCA Zakat certificate ZATCA-ZK-55821, valid until 2026-12-05, which is after the 2026-12-01 deadline. [TO CONFIRM: it expires four days after the deadline, so renewal is advisable.]\nR3: Complied. GOSI certificate GOSI-778812, valid until 2027-01-31.\nR4: Complied. Saudization (Nitaqat) certificate NTQ-PLAT-2026, Platinum band, valid until 2027-03-01.\nR5: Complied. ISO/IEC 27001:2022 certificate ISO27001-FA-2024, valid until 2027-05-30.\nR6: Complied. LCGPA-certified local content certificate LC-52-2026 shows 52%, above the 40% minimum, valid until 2027-06-30.\nR7: Complied. P1 (2023-2024) and P2 (2024-2025) are two conversational AI projects within the last five years.\nR8: Complied. P1 is SAR 3.2 million and P2 is SAR 4.8 million, both above SAR 2,000,000.\nR9: Complied. Client reference letters are available for P1 and P2. [TO CONFIRM: attach the letters.]\nR10: Complied. All production workloads, including AI model hosting, run in in-Kingdom data centres (Riyadh and Jeddah); P2 was hosted in-Kingdom. [TO CONFIRM: that logs and backups are also in-Kingdom.]\nR11: Complied. ECC compliance report ECC-2026-03, valid until 2027-03-31; P2 was NCA ECC compliant.\nR12: Partially evidenced. A PDPL programme and an appointed DPO are in place. [TO CONFIRM: PDPL certificate or audit evidence, which is not in the files.]\nR13: Complied at company level. We have 3 PMP-certified project managers. [TO CONFIRM: named project manager and PMP certificate.]\nR14: Partially evidenced. P1 included handover to human agents. [TO CONFIRM: that full conversation context is passed to the agent.]\nR15: Complied. P1 delivered a chatbot on web, mobile and WhatsApp.\nR16: Partially evidenced. P1 was bilingual Arabic/English with Najdi and Hijazi support. [TO CONFIRM: Modern Standard Arabic support.]\nR17: Partially evidenced. P2 integrated with a case-management system. [TO CONFIRM: that the integration used REST APIs.]\nR18: Not evidenced. [TO CONFIRM: admin console for content updates; no file mentions it.]\nR19: Partially evidenced. We have dashboard and analytics experience (P4). [TO CONFIRM: conversational AI analytics dashboard capability.]\nR20: Partially evidenced. A 24/7 support and operations rota exists, and P2 reported 6 months of live operation. [TO CONFIRM: support-contract evidence.]\nR21: Not evidenced. [TO CONFIRM: ability to maintain 99.5% availability; no past SLA or availability record is provided.]\nR22: Complied. P1 included Najdi dialect support.\nR23: Complied. P1 included Hijazi dialect support.\nR24: Not evidenced (optional). [TO CONFIRM: Gulf dialect support.]\nR25: Not evidenced (optional). [TO CONFIRM: Southern dialect support.]\nR26: Commitment to be confirmed. [TO CONFIRM: 12-month build plus 6-month operation schedule; no evidence on this in the files.]\nR27: Submission formality. We will submit by 2026-12-01 at 13:00 Riyadh time. [TO CONFIRM: submission owner and logistics.]\nR28: Optional formality. [TO CONFIRM: whether to submit clarification questions by 2026-11-15, for example on REST API specifications and the SLA.]\nR29: Submission formality. The technical proposal will be a separate envelope. [TO CONFIRM: bid-team assembly.]\nR30: Submission formality. The financial proposal will be a separate envelope. [TO CONFIRM: bid-team assembly.]\nR31: Not evidenced. [TO CONFIRM: bid bond of 1% of bid value (about SAR 65,000 on the SAR 6.5 million estimate) valid 90 days; no bank guarantee facility is documented.]\nR32: Being prepared. This section serves as the draft basis for the compliance matrix. [TO CONFIRM: final matrix covering all of Sections 3 and 4.]\nR33: Cannot be verified. [TO CONFIRM: the 65% technical pass mark depends on the Authority's evaluation.]"
+        },
+        {
+          "title": "7. Open items for human review",
+          "content": "Requirements with status partial, unknown or gap (R12-R14 are mandatory and need priority resolution):\n\nPartial:\n- R12 (mandatory): PDPL. Programme and DPO exist; no certificate or audit evidence in the files. Obtain evidence.\n- R14 (mandatory): Human handover with full conversation context. P1 included handover, but context transfer is not documented. Confirm product capability.\n- R16 (mandatory): Arabic MSA and Saudi dialects. Najdi and Hijazi are documented; MSA is not explicitly stated.\n- R17 (mandatory): REST API integration with the case-management system. P2 integrated with a case-management system; REST is not stated.\n- R19 (mandatory): Analytics dashboard. Dashboard experience exists (P4); no conversational AI analytics dashboard is documented.\n- R20 (mandatory): 6 months of operation and support. A 24/7 rota exists and P2 had 6 months live; support-contract evidence is missing.\n\nUnknown:\n- R18 (mandatory): Admin console for content updates. No file mentions it.\n- R21 (mandatory): 99.5% availability. No past SLA or availability record.\n- R24 (optional): Gulf dialects. Not documented.\n- R25 (optional): Southern dialects. Not documented.\n- R26 (mandatory): 12+6 month plan. No schedule evidence.\n- R27 (mandatory): Deadline 2026-12-01 at 13:00 Riyadh time. Assign an owner and plan submission logistics.\n- R28 (optional): Clarification questions by 2026-11-15. Suggested topics: REST API specification, SLA definition, handover context format.\n- R29 (mandatory): Separate technical envelope.\n- R30 (mandatory): Separate financial envelope.\n- R31 (mandatory): Bid bond of 1% of bid value valid 90 days. No bank guarantee facility is documented; arrange it.\n- R32 (mandatory): Compliance matrix for all of Sections 3 and 4.\n- R33 (mandatory): 65% technical pass mark. Cannot be verified from the files.\n\nOther points for reviewers:\n- Zakat certificate (R2) is marked as met, but it expires 2026-12-05, four days after the deadline. Start renewal now and confirm it remains valid through award.\n- The named project manager (R13) and all team members need names, CVs and allocations.\n- Scale: 400,000 enquiries per month is about double P2's average monthly volume. Capacity and load-handling evidence is needed.\n- Technical architecture, technology stack, project schedule and pricing are not in the company files and must be provided by the delivery and finance teams.\n- Confirm that the P1 and P2 reference letters can be attached and disclosed."
+        }
+      ]
+    }
+  },
+  "verifications": {
+    "T101_citizen_ai_assistant": {
+      "tender_id": "T101_citizen_ai_assistant",
+      "passed": true,
+      "issues": []
+    }
+  },
+  "human_questions": [
+    {
+      "tender_id": "T101_citizen_ai_assistant",
+      "question": "Zakat certificate ZATCA-ZK-55821 expires 2026-12-05, 4 days after the 2026-12-01 deadline. Please renew it now and upload it. Also please confirm the bid bond and approve the final price before submission."
+    },
+    {
+      "tender_id": "T104_archive_digitization_ar",
+      "question": "T104 is a conditional bid. The Zakat certificate expires 2026-12-05, before the 2026-12-10 deadline. Please confirm the renewal and its date. Please also confirm whether we have scanning capacity or a scanning partner for 2.5M pages, including title deeds and permits. P3 was 1.8M pages and the files show no scanning equipment."
+    }
+  ],
+  "shortlist": [
+    {
+      "reference": "L-2026-001",
+      "relevance": 95,
+      "recommend": "download",
+      "reason": "Bilingual AI citizen-services assistant closely matches past projects P1 and P2 (SAR 4.8M, in-Kingdom, NCA ECC); SAR 6.5M is within the SAR 10M comfort limit and the deadline of 2026-12-01 allows about a month."
+    },
+    {
+      "reference": "L-2026-003",
+      "relevance": 93,
+      "recommend": "download",
+      "reason": "Archive digitization with AI data extraction matches P3 (1.8M pages of Arabic OCR, including handwritten) and the SAR 3.8M value is comfortably in range."
+    },
+    {
+      "reference": "L-2026-010",
+      "relevance": 90,
+      "recommend": "skip",
+      "reason": "Contract clause extraction with NLP matches P5, but the deadline of 2026-10-20 has already passed (today is 2026-10-30)."
+    },
+    {
+      "reference": "L-2026-005",
+      "relevance": 72,
+      "recommend": "download",
+      "reason": "Arabic speech-to-text falls within Arabic NLP and voice assistants, but no past project covers speech recognition specifically, so the gap should be checked in the full documents."
+    },
+    {
+      "reference": "L-2026-008",
+      "relevance": 70,
+      "recommend": "download",
+      "reason": "Data analytics platform fits P4 (municipal dashboards) and the data-platform capability, but at SAR 9M it is near the SAR 10M comfort limit and the smart-city scope may include IoT elements the company does not do."
+    },
+    {
+      "reference": "L-2026-007",
+      "relevance": 5,
+      "recommend": "skip",
+      "reason": "A radiology triage system is a regulated medical device, and the company holds no SFDA MDMA or ISO 13485 and has no clinical staff."
+    },
+    {
+      "reference": "L-2026-009",
+      "relevance": 3,
+      "recommend": "skip",
+      "reason": "Laptop hardware supply is outside the company's scope, which covers no hardware."
+    },
+    {
+      "reference": "L-2026-002",
+      "relevance": 2,
+      "recommend": "skip",
+      "reason": "Office furniture supply is outside the company's scope, which is AI, NLP, OCR and data platforms."
+    },
+    {
+      "reference": "L-2026-004",
+      "relevance": 1,
+      "recommend": "skip",
+      "reason": "Cleaning and maintenance of schools is facility maintenance, which the company explicitly does not do."
+    },
+    {
+      "reference": "L-2026-006",
+      "relevance": 0,
+      "recommend": "skip",
+      "reason": "School construction at SAR 28M is outside the company's scope and far above its SAR 10M comfort limit, and no contractor classification is held."
+    }
+  ],
+  "listings": [
+    {
+      "reference": "L-2026-001",
+      "title": "Bilingual AI virtual assistant for citizen services",
+      "entity": "General Authority for Citizen Services (fictional)",
+      "activity": "Information technology",
+      "deadline": "2026-12-01",
+      "value_sar": "6500000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-002",
+      "title": "توريد أثاث مكتبي لمبنى الإدارة",
+      "entity": "أمانة المنطقة الوسطى الوهمية",
+      "activity": "توريدات عامة",
+      "deadline": "2026-11-18",
+      "value_sar": "850000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-003",
+      "title": "رقمنة الأرشيف الورقي واستخراج البيانات بالذكاء الاصطناعي",
+      "entity": "أمانة المنطقة الشرقية الوهمية",
+      "activity": "تقنية المعلومات",
+      "deadline": "2026-12-10",
+      "value_sar": "3800000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-004",
+      "title": "Cleaning and maintenance services for 12 schools",
+      "entity": "Education Infrastructure Program (fictional)",
+      "activity": "Operation and maintenance",
+      "deadline": "2026-11-22",
+      "value_sar": "2400000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-005",
+      "title": "Arabic speech-to-text platform for call center quality monitoring",
+      "entity": "National Utilities Company (fictional)",
+      "activity": "Information technology",
+      "deadline": "2026-12-20",
+      "value_sar": "4100000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-006",
+      "title": "Construction of a 24-classroom secondary school",
+      "entity": "Education Infrastructure Program (fictional)",
+      "activity": "Construction",
+      "deadline": "2026-11-30",
+      "value_sar": "28000000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-007",
+      "title": "AI-assisted radiology triage system",
+      "entity": "Central Specialist Hospital Cluster (fictional)",
+      "activity": "Medical devices",
+      "deadline": "2026-11-25",
+      "value_sar": "7200000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-008",
+      "title": "منصة تحليلات بيانات للمدينة الذكية",
+      "entity": "هيئة تطوير المنطقة الشمالية الوهمية",
+      "activity": "تقنية المعلومات",
+      "deadline": "2026-12-15",
+      "value_sar": "9000000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-009",
+      "title": "Supply of 300 laptops and accessories",
+      "entity": "Ministry of Sports (fictional)",
+      "activity": "IT hardware supply",
+      "deadline": "2026-11-12",
+      "value_sar": "1900000",
+      "url": ""
+    },
+    {
+      "reference": "L-2026-010",
+      "title": "Contract document review and clause extraction using NLP",
+      "entity": "National Energy Holding (fictional)",
+      "activity": "Information technology",
+      "deadline": "2026-10-20",
+      "value_sar": "1200000",
+      "url": ""
+    }
+  ],
+  "data_set": "sample",
+  "audit_log": [
+    {
+      "id": 246,
+      "ts": "2026-10-30T03:47:45",
+      "tender_id": "-",
+      "step": "screen",
+      "detail": "Screened 10 listings: 4 worth downloading"
+    },
+    {
+      "id": 247,
+      "ts": "2026-10-30T03:47:45",
+      "tender_id": "-",
+      "step": "discover",
+      "detail": "Found 5 tender document sets"
+    },
+    {
+      "id": 248,
+      "ts": "2026-10-30T03:47:55",
+      "tender_id": "T105_school_construction",
+      "step": "extract",
+      "detail": "13 requirements (13 mandatory), deadline 2026-11-30"
+    },
+    {
+      "id": 249,
+      "ts": "2026-10-30T03:47:56",
+      "tender_id": "T103_radiology_ai",
+      "step": "extract",
+      "detail": "18 requirements (18 mandatory), deadline 2026-11-25"
+    },
+    {
+      "id": 250,
+      "ts": "2026-10-30T03:47:57",
+      "tender_id": "T102_smart_city_platform",
+      "step": "extract",
+      "detail": "22 requirements (21 mandatory), deadline 2026-12-15"
+    },
+    {
+      "id": 251,
+      "ts": "2026-10-30T03:47:57",
+      "tender_id": "T104_archive_digitization_ar",
+      "step": "extract",
+      "detail": "19 requirements (19 mandatory), deadline 2026-12-10"
+    },
+    {
+      "id": 252,
+      "ts": "2026-10-30T03:48:00",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "extract",
+      "detail": "33 requirements (30 mandatory), deadline 2026-12-01"
+    },
+    {
+      "id": 253,
+      "ts": "2026-10-30T03:48:13",
+      "tender_id": "T105_school_construction",
+      "step": "qualify",
+      "detail": "NO_BID (fit 2/100). Blockers: 4"
+    },
+    {
+      "id": 254,
+      "ts": "2026-10-30T03:48:13",
+      "tender_id": "T105_school_construction",
+      "step": "gap",
+      "detail": "R7: No contractor classification in Buildings (Grade 3+). The company holds no construction classification of any grade, and it cannot be obtained before the deadline."
+    },
+    {
+      "id": 255,
+      "ts": "2026-10-30T03:48:13",
+      "tender_id": "T105_school_construction",
+      "step": "gap",
+      "detail": "R12: No completed school or public-building projects above SAR 15 million. Past projects are all software/AI projects, with a maximum of SAR 4.8 million."
+    },
+    {
+      "id": 256,
+      "ts": "2026-10-30T03:48:13",
+      "tender_id": "T105_school_construction",
+      "step": "gap",
+      "detail": "R1: Civil, structural, MEP and finishing works are outside the company's scope (profile.md: no construction or civil works). It has no civil engineers or site staff."
+    },
+    {
+      "id": 257,
+      "ts": "2026-10-30T03:48:13",
+      "tender_id": "T105_school_construction",
+      "step": "gap",
+      "detail": "R4: Site supervision and handover of construction works are outside the company's scope and capability, since it has no construction site staff."
+    },
+    {
+      "id": 258,
+      "ts": "2026-10-30T03:48:19",
+      "tender_id": "T103_radiology_ai",
+      "step": "qualify",
+      "detail": "NO_BID (fit 5/100). Blockers: 4"
+    },
+    {
+      "id": 259,
+      "ts": "2026-10-30T03:48:19",
+      "tender_id": "T103_radiology_ai",
+      "step": "gap",
+      "detail": "R5: SFDA Medical Device Marketing Authorization is not held, and a product authorization cannot be obtained before the deadline."
+    },
+    {
+      "id": 260,
+      "ts": "2026-10-30T03:48:19",
+      "tender_id": "T103_radiology_ai",
+      "step": "gap",
+      "detail": "R6: ISO 13485 is not held, and the company is not a medical device manufacturer or authorized representative."
+    },
+    {
+      "id": 261,
+      "ts": "2026-10-30T03:48:19",
+      "tender_id": "T103_radiology_ai",
+      "step": "gap",
+      "detail": "R7: The company has 7 years of operation and no healthcare IT experience, against a required 10 years of healthcare IT delivery in the Kingdom."
+    },
+    {
+      "id": 262,
+      "ts": "2026-10-30T03:48:19",
+      "tender_id": "T103_radiology_ai",
+      "step": "gap",
+      "detail": "R12: Supplying an AI triage medical device is outside the company's scope (profile.md: no medical devices or clinical software)."
+    },
+    {
+      "id": 263,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T104_archive_digitization_ar",
+      "step": "qualify",
+      "detail": "CONDITIONAL_BID (fit 80/100). Blockers: 1"
+    },
+    {
+      "id": 264,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T104_archive_digitization_ar",
+      "step": "gap",
+      "detail": "R6: The Zakat certificate (ZATCA-ZK-55821) expires on 2026-12-05, before the 2026-12-10 deadline. It must be renewed and a certificate valid on the submission date obtained before bidding. Today is 2026-10-30, so start the renewal now."
+    },
+    {
+      "id": 265,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T102_smart_city_platform",
+      "step": "qualify",
+      "detail": "NO_BID (fit 22/100). Blockers: 3"
+    },
+    {
+      "id": 266,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T102_smart_city_platform",
+      "step": "gap",
+      "detail": "R7: no CMMI Level 3 (Development) appraisal is held (certifications.json lists CMMI as not held). This is a disqualification without technical evaluation and cannot realistically be fixed before the deadline."
+    },
+    {
+      "id": 267,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T102_smart_city_platform",
+      "step": "gap",
+      "detail": "R2: the Zakat certificate expires on 2026-12-05, before the 2026-12-15 deadline. It must be renewed before submission. This is fixable and alone would justify a CONDITIONAL_BID."
+    },
+    {
+      "id": 268,
+      "ts": "2026-10-30T03:48:24",
+      "tender_id": "T102_smart_city_platform",
+      "step": "gap",
+      "detail": "R16: the company does not do IoT installation or field sensor networks (profile.md). A qualified installation subcontractor must be identified and named in the bid, and none is documented in the company files."
+    },
+    {
+      "id": 269,
+      "ts": "2026-10-30T03:48:28",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "qualify",
+      "detail": "BID (fit 86/100). Blockers: 0"
+    },
+    {
+      "id": 270,
+      "ts": "2026-10-30T03:48:30",
+      "tender_id": "-",
+      "step": "rank",
+      "detail": "Ranking: T101_citizen_ai_assistant (BID, 86), T104_archive_digitization_ar (CONDITIONAL_BID, 80), T102_smart_city_platform (NO_BID, 22), T103_radiology_ai (NO_BID, 5), T105_school_construction (NO_BID, 2)"
+    },
+    {
+      "id": 271,
+      "ts": "2026-10-30T03:48:31",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "draft",
+      "detail": "Writing proposal…"
+    },
+    {
+      "id": 272,
+      "ts": "2026-10-30T03:49:21",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "draft",
+      "detail": "Proposal draft r1: 7 sections"
+    },
+    {
+      "id": 273,
+      "ts": "2026-10-30T03:49:34",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "verify",
+      "detail": "PASSED"
+    },
+    {
+      "id": 274,
+      "ts": "2026-10-30T03:49:37",
+      "tender_id": "T101_citizen_ai_assistant",
+      "step": "human",
+      "detail": "Question for the bid manager: Zakat certificate ZATCA-ZK-55821 expires 2026-12-05, 4 days after the 2026-12-01 deadline. Please renew it now and upload it. Also please confirm the bid bond and approve the final price before submission."
+    },
+    {
+      "id": 275,
+      "ts": "2026-10-30T03:49:37",
+      "tender_id": "T104_archive_digitization_ar",
+      "step": "human",
+      "detail": "Question for the bid manager: T104 is a conditional bid. The Zakat certificate expires 2026-12-05, before the 2026-12-10 deadline. Please confirm the renewal and its date. Please also confirm whether we have scanning capacity or a scanning partner for 2.5M pages, including title deeds and permits. P3 was 1.8M pages and the files show no scanning equipment."
+    }
+  ],
+  "actions": [
+    {
+      "id": 26,
+      "tender_id": "T101_citizen_ai_assistant",
+      "action": "Zakat certificate ZATCA-ZK-55821 expires 2026-12-05, 4 days after the 2026-12-01 deadline. Please renew it now and upload it. Also please confirm the bid bond and approve the final price before submission.",
+      "owner": "human",
+      "status": "open",
+      "created_at": "2026-10-30T03:49:37"
+    },
+    {
+      "id": 27,
+      "tender_id": "T104_archive_digitization_ar",
+      "action": "T104 is a conditional bid. The Zakat certificate expires 2026-12-05, before the 2026-12-10 deadline. Please confirm the renewal and its date. Please also confirm whether we have scanning capacity or a scanning partner for 2.5M pages, including title deeds and permits. P3 was 1.8M pages and the files show no scanning equipment.",
+      "owner": "human",
+      "status": "open",
+      "created_at": "2026-10-30T03:49:37"
+    }
+  ]
+}

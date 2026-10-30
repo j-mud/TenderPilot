@@ -14,6 +14,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+from agent.documents import normalize_deadline
 from eval import score
 from run import DEFAULT_GOAL, output_dir
 
@@ -21,10 +22,12 @@ load_dotenv(Path(__file__).parent / ".env")
 
 ROOT = Path(__file__).parent
 DATA_SETS = sorted(p.name for p in (ROOT / "data").iterdir() if (p / "company").is_dir())
+BACKUP = ROOT / "demo_backup"  # a saved good run of the sample data, for when the API or Wi-Fi fails
 
 DECISION_LABEL = {"BID": "🟢 Bid", "CONDITIONAL_BID": "🟡 Conditional bid", "NO_BID": "🔴 No bid"}
 STATUS_LABEL = {"met": "✅ met", "partial": "🟡 partial", "gap": "❌ gap", "unknown": "❔ unknown"}
 REC_LABEL = {"download": "⬇ download", "maybe": "🤔 maybe", "skip": "⏭ skip"}
+REC_ORDER = {"download": 0, "maybe": 1, "skip": 2}
 STEP_ICON = {"screen": "🗂️", "discover": "🔎", "extract": "📄", "qualify": "⚖️", "gap": "🚩", "rank": "🏆", "draft": "✍️",
              "verify": "🧪", "human": "🙋", "plan": "🧭", "think": "💭", "finish": "✅", "error": "⚠️"}
 
@@ -53,14 +56,18 @@ with st.sidebar:
     data_set = st.selectbox("Data set", DATA_SETS, index=DATA_SETS.index("sample") if "sample" in DATA_SETS else 0,
                             help="sample = fictional demo data · my_company = your real company and tenders")
     DATA_DIR = ROOT / "data" / data_set
-    OUT = output_dir(DATA_DIR)
+    use_backup = data_set == "sample" and (BACKUP / "results.json").exists() and st.toggle(
+        "Load backup run", help="Show a saved run instantly, with no API calls (if the API or Wi-Fi fails).")
+    OUT = BACKUP if use_backup else output_dir(DATA_DIR)
     RESULTS = OUT / "results.json"
     goal = st.text_area("Goal", DEFAULT_GOAL, height=140)
     mode = st.radio("Mode", ["agent", "pipeline"], help="agent = the model plans its own steps; pipeline = fixed order (fallback)")
-    run_clicked = st.button("▶ Run TenderPilot", type="primary", width="stretch")
+    run_clicked = st.button("▶ Run TenderPilot", type="primary", width="stretch", disabled=use_backup)
     st.divider()
     st.caption(f"Provider: {os.getenv('LLM_PROVIDER', 'anthropic')} · Model: {os.getenv('LLM_MODEL', 'default')}")
-    if RESULTS.exists():
+    if use_backup:
+        st.caption("Showing the saved backup run. Turn the toggle off to run live.")
+    elif RESULTS.exists():
         st.caption("Showing the last saved run until you start a new one.")
 
 if data_set == "sample":
@@ -139,12 +146,20 @@ if s:
 if results.get("shortlist"):
     st.subheader("Listing screen (public Etimad listings)")
     by_ref = {r["reference"]: r for r in results.get("listings", [])}
+
+    def rec_label(x: dict) -> str:
+        deadline, _ = normalize_deadline(str(by_ref.get(x["reference"], {}).get("deadline", "")))
+        if x["recommend"] == "skip" and deadline and deadline < results.get("generated_on", ""):
+            return "⏭ skip: deadline passed"
+        return REC_LABEL[x["recommend"]]
+
+    shortlist = sorted(results["shortlist"], key=lambda x: (REC_ORDER[x["recommend"]], -x["relevance"]))
     rows = [{
-        "Ref": x["reference"], "Title": by_ref.get(x["reference"], {}).get("title", ""),
+        "Ref": x["reference"], "Recommendation": rec_label(x), "Relevance": x["relevance"],
+        "Title": by_ref.get(x["reference"], {}).get("title", ""),
         "Entity": by_ref.get(x["reference"], {}).get("entity", ""),
-        "Deadline": by_ref.get(x["reference"], {}).get("deadline", ""),
-        "Relevance": x["relevance"], "Recommendation": REC_LABEL[x["recommend"]], "Why": x["reason"],
-    } for x in results["shortlist"]]
+        "Deadline": by_ref.get(x["reference"], {}).get("deadline", ""), "Why": x["reason"],
+    } for x in shortlist]
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                  column_config={"Relevance": st.column_config.ProgressColumn("Relevance", min_value=0, max_value=100, format="%d")})
 
