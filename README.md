@@ -54,20 +54,40 @@ and merged without duplicates, OCR fallback for scanned Arabic pages, and `meta.
 `answer_key.json` holds the correct answers; `eval.py` scores each run on decisions,
 requirement recall and traps caught.
 
-## Quick start
+## Results
+
+Sample data (5 tenders, 10 listings), scored by `eval.py` against `answer_key.json`, model `claude-sonnet-5-5`:
+
+| Mode | Decisions correct | Requirement recall | Traps caught | Run time |
+|---|---|---|---|---|
+| Pipeline (`--mode pipeline`) | 100% | 100% | 100% | ~150 s |
+| Agent (`python run.py`) | 100% | 100% | 100% | ~180 s |
+| Agent in the UI (streamed draft) | 100% | 100% | 100% | ~130–150 s |
+
+The 5 tenders are extracted and qualified in parallel (about 50 s in total, down from about 130 s one at a time).
+Most of the remaining time is the single proposal-drafting call, which the UI streams live.
+Run times vary with API load.
+
+| Proposal written live | Ranking and listing screen | Compliance matrix and proposal |
+|---|---|---|
+| ![Streaming draft](docs/ui_streaming.png) | ![Overview](docs/ui_overview.png) | ![Details](docs/ui_details.png) |
+
+## How to run
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env             # then add your API key
-streamlit run app.py             # UI
-# or
-python run.py                    # CLI, autonomous mode, sample data
-python run.py --data data/my_company   # your company + real tenders
-python run.py --mode pipeline    # CLI, fixed-order fallback
-python eval.py                   # score the last run
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+cp .env.example .env      # then add your ANTHROPIC_API_KEY to .env
+streamlit run app.py      # then open http://localhost:8501
 ```
+
+The app only listens on `localhost` (see `.streamlit/config.toml`) and does not open a browser tab itself.
+If the API or Wi-Fi fails during a demo, switch on **Load backup run** in the sidebar to show the saved run in `demo_backup/`.
+
+Other commands:
+- `python run.py` runs the autonomous agent from the CLI, on the sample data
+- `python run.py --mode pipeline` runs the fixed-order fallback
+- `python run.py --data data/my_company` runs on your company and real tenders
+- `python eval.py` scores the last run
 
 Works with Claude (default) or any OpenAI-compatible endpoint: set `LLM_PROVIDER=openai`
 and `OPENAI_BASE_URL` in `.env`.
@@ -80,7 +100,8 @@ python tests/test_flow.py
 
 A deliberately careless fake model runs the full workflow, and the tests check that the
 guardrails catch its mistakes (expired Zakat certificate, missing evidence, a forgotten
-requirement that forces a redraft, a bad tool call the agent recovers from), and that a
+requirement that forces a redraft, a bad tool call the agent recovers from), that parallel tool
+calls extract each tender only once, that a broken draft stream falls back to a normal call, and that a
 30-page multi-file PDF pack with a clause hidden in its appendix and a Hijri deadline is read correctly.
 
 ## Project layout
@@ -100,6 +121,9 @@ run.py          CLI
 eval.py         scoring against answer_key.json
 data/sample/    fictional company, tenders, listings
 data/my_company/ template for your real company and tenders
+demo_backup/    a saved good run of the sample data ("Load backup run")
+docs/           screenshots
+.streamlit/     app config (localhost only)
 ```
 
 ## Next steps
