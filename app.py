@@ -190,11 +190,11 @@ if blocked:
                                 "to see a complete saved run." if uploading else
                                 "Switch on **Load backup run** in the sidebar to see a complete saved run right away."))
     run_clicked = False
-if run_clicked:
-    from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 
-    from agent.loop import run_agent, run_pipeline, run_single
-    from run import build_pilot
+
+def run_live(build, work) -> None:
+    """build(on_event) makes the pilot, work(pilot) runs it: with the live log and streamed draft, then saved to OUT."""
+    from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 
     with st.status("TenderPilot is working…", expanded=True) as status:
         live = {"box": None, "text": "", "shown": 0.0}  # the proposal being written right now
@@ -215,16 +215,13 @@ if run_clicked:
             status.write(f"{STEP_ICON.get(kind, '•')} **{kind}** — {msg}")
 
         try:
-            pilot = build_pilot(DATA_DIR, on_event=on_event, company_dir=COMPANY_DIR, out_dir=OUT)
+            pilot = build(on_event)
             pilot.on_stream = on_stream
             ctx = get_script_run_ctx()
             pilot.thread_init = lambda: add_script_run_ctx(ctx=ctx)  # parallel tools can write to the live log
             if pilot.company.unfinished():
                 st.warning(f"Company files still contain TODO placeholders: {', '.join(pilot.company.unfinished())}")
-            if uploading:
-                summary = run_single(pilot, upload_id)
-            else:
-                summary = (run_agent if mode == "agent" else run_pipeline)(pilot, goal)
+            summary = work(pilot)
             pilot.save(OUT)
             status.update(label=f"Done. {summary[:120]}", state="complete", expanded=False)
         except Exception as err:
@@ -234,6 +231,36 @@ if run_clicked:
         finally:
             if BUDGET:
                 BUDGET.finish()
+
+
+if run_clicked:
+    from agent.loop import run_agent, run_pipeline, run_single
+    from run import build_pilot
+
+    run_live(lambda on_event: build_pilot(DATA_DIR, on_event=on_event, company_dir=COMPANY_DIR, out_dir=OUT),
+             (lambda pilot: run_single(pilot, upload_id)) if uploading else
+             (lambda pilot: (run_agent if mode == "agent" else run_pipeline)(pilot, goal)))
+
+# The bid manager answered a question ("Send" below): continue the saved run with that answer.
+pending = st.session_state.pop("pending_answer", None)
+if pending and not use_backup and RESULTS.exists():
+    from agent.loop import resolve_answer
+    from run import build_pilot
+
+    index, question, answer = pending
+    saved = json.loads(RESULTS.read_text(encoding="utf-8"))
+    qs = saved.get("human_questions", [])
+    if index >= len(qs) or qs[index]["question"] != question or qs[index].get("answer"):
+        st.warning("That question has changed since you answered it (a new run started). Please answer again.")
+    elif blocked := (BUDGET.try_start() if BUDGET else None):
+        st.warning(f"{blocked} Your answer was not sent; please try again later.")
+    else:
+        def build_continued(on_event):
+            pilot = build_pilot(DATA_DIR, on_event=on_event, company_dir=COMPANY_DIR, out_dir=OUT, reset=False)
+            pilot.restore(saved)
+            return pilot
+
+        run_live(build_continued, lambda pilot: resolve_answer(pilot, index, answer))
 
 if not RESULTS.exists():
     if uploading:
@@ -256,7 +283,9 @@ c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Tenders analyzed", len(quals))
 c2.metric("Worth bidding", sum(q["decision"] != "NO_BID" for q in quals.values()))
 c3.metric("Gaps caught", sum(len(q["blockers"]) for q in quals.values()))
-c4.metric("Questions for you", len(results["human_questions"]))
+c4.metric("Questions for you", sum(not hq.get("answer") for hq in results["human_questions"]))
+if s and any(hq.get("answer") for hq in results["human_questions"]):
+    s = None  # the answer key describes the tenders before the bid manager's answers
 if s:
     c5.metric("Decisions correct", f"{s['percent']['decision']}%",
               f"{s['percent']['requirements']}% reqs · {s['percent']['traps']}% traps", delta_color="off")
@@ -307,10 +336,29 @@ st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch", column_c
     "Fit": st.column_config.ProgressColumn("Fit", min_value=0, max_value=100, format="%d", width=85),
     "Blockers": st.column_config.NumberColumn(width=65)})
 
+def queue_answer(index: int, question: str, key: str) -> None:
+    """'Send' callback: handled at the top of the next rerun, where the live log is shown."""
+    if st.session_state.get(key, "").strip():
+        st.session_state["pending_answer"] = (index, question, st.session_state[key].strip())
+
+
 if results["human_questions"]:
     st.subheader("🙋 Waiting on you")
-    for hq in results["human_questions"]:
+    if use_backup and any(not hq.get("answer") for hq in results["human_questions"]):
+        st.caption("Turn off **Load backup run** to answer these questions; the agent then re-checks the tender.")
+    for i, hq in enumerate(results["human_questions"]):
+        if hq.get("answer"):
+            st.success(f"**{hq['tender_id']}** — {hq['question']}\n\n**Your answer:** {hq['answer']}", icon="✅")
+            continue
         st.warning(f"**{hq['tender_id']}** — {hq['question']}")
+        if use_backup:
+            continue
+        with st.form(f"answer_form_{i}", clear_on_submit=True, border=False):
+            box, send = st.columns([6, 1], vertical_alignment="bottom")
+            box.text_input("Your answer", key=f"answer_{i}", label_visibility="collapsed",
+                           placeholder="Your answer, e.g. Zakat renewed, new certificate valid until 2027-12-01")
+            send.form_submit_button("Send", type="primary", width="stretch",
+                                    on_click=queue_answer, args=(i, hq["question"], f"answer_{i}"))
 
 # ---------------------------------------------------------------- per tender
 st.subheader("Tender details")

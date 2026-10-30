@@ -98,6 +98,12 @@ a title, deadline (Gregorian or Hijri) and value, choose the company profile, an
 Files are kept in a temporary folder for your browser session (`output/uploads/`, never committed) and are
 sent to the AI provider for analysis.
 
+To close the loop on a question in **Waiting on you**, type the answer and press **Send** (e.g. "Zakat renewed,
+new certificate valid until 2027-12-01"). The answer is recorded in the audit log and added to the company
+knowledge for that run (`bid_manager_answers.md`, which the agent can cite; files on disk are not changed). The
+agent re-qualifies that tender, and if it becomes a BID, it drafts and verifies the proposal. A certificate's
+expiry date is only updated when the answer names exactly one certificate and one date.
+
 Other commands:
 - `python run.py` runs the autonomous agent from the CLI, on the sample data
 - `python run.py --mode pipeline` runs the fixed-order fallback
