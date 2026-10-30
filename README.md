@@ -54,6 +54,13 @@ and merged without duplicates, OCR fallback for scanned Arabic pages, and `meta.
 `answer_key.json` holds the correct answers; `eval.py` scores each run on decisions,
 requirement recall and traps caught.
 
+## Live demo
+
+**[TenderPilot on Streamlit Community Cloud](https://YOUR-APP.streamlit.app)**: password available on request.
+
+The public app opens on a saved run of the fictional sample data. Visitors can switch off **Load backup run** to
+start a live run; live runs are limited to 10 per day, one at a time, at most one every 2 minutes.
+
 ## Results
 
 Sample data (5 tenders, 10 listings), scored by `eval.py` against `answer_key.json`, model `claude-sonnet-5-5`:
@@ -77,10 +84,12 @@ Run times vary with API load.
 ```bash
 python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 cp .env.example .env      # then add your ANTHROPIC_API_KEY to .env
-streamlit run app.py      # then open http://localhost:8501
+streamlit run app.py --server.address localhost   # then open http://localhost:8501
 ```
 
-The app only listens on `localhost` (see `.streamlit/config.toml`) and does not open a browser tab itself.
+`--server.address localhost` keeps the app on your machine; without it, Streamlit also serves it to your local
+network. (The setting is on the command line, not in `.streamlit/config.toml`, because that file is shared
+with the cloud deployment, which must be reachable.) The app does not open a browser tab itself.
 If the API or Wi-Fi fails during a demo, switch on **Load backup run** in the sidebar to show the saved run in `demo_backup/`.
 
 Other commands:
@@ -115,6 +124,7 @@ agent/
   tools.py      the agent's tools + guardrails
   loop.py       autonomous orchestrator and fixed pipeline
   store.py      SQLite tracker and audit log
+  run_budget.py daily cap and cooldown for live runs on the public demo
   export.py     proposal → Word with compliance matrix
 app.py          Streamlit UI
 run.py          CLI
@@ -123,7 +133,7 @@ data/sample/    fictional company, tenders, listings
 data/my_company/ template for your real company and tenders
 demo_backup/    a saved good run of the sample data ("Load backup run")
 docs/           screenshots
-.streamlit/     app config (localhost only)
+.streamlit/     theme config, secrets.toml.example (for Streamlit Cloud)
 ```
 
 ## Next steps

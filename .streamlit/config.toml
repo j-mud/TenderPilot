@@ -1,6 +1,7 @@
-# Only reachable from this machine; open http://localhost:8501 yourself (no auto-opened browser tab).
+# Shared by local runs and Streamlit Community Cloud.
+# No server.address here: the cloud must serve the app publicly. Locally, keep it on this machine with:
+#   streamlit run app.py --server.address localhost
 [server]
-address = "localhost"
 headless = true
 
 [browser]
