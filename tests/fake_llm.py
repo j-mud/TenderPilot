@@ -47,6 +47,13 @@ class FakeLLM:
             return VerificationReport(tender_id=tid, passed=True, issues=[])
         raise NotImplementedError(schema)
 
+    def stream_structured(self, system, prompt, schema, on_text):
+        result = self.structured(system, prompt, schema)
+        text = result.model_dump_json()
+        for i in range(0, len(text), 40):
+            on_text(text[i : i + 40])
+        return result
+
     def _extract(self, prompt):
         tid = re.search(r"Tender ID: ([A-Za-z0-9_\-]+)", prompt).group(1)
         m = re.search(r"(\d{4}-\d{2}-\d{2})", prompt)

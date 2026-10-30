@@ -69,6 +69,7 @@ class TenderPilot:
 
         self.on_event = locked_event
         self.thread_init: Callable[[], None] | None = None  # e.g. lets Streamlit write from workers
+        self.on_stream: Callable[[str, str], None] | None = None  # (tender_id, text chunk) while a draft is written
         self._tender_locks = {tid: threading.Lock() for tid in self.tenders}
         self.company = CompanyKnowledge(data_dir / "company")
         self.listings = load_listings(data_dir / "listings.csv")
@@ -336,7 +337,12 @@ class TenderPilot:
             "'[TO CONFIRM: ...]'. Write in clear professional English."
             + revision_note
         )
-        draft = self.llm.structured(ANALYST_SYSTEM, prompt, ProposalDraft)
+        if self.on_stream and hasattr(self.llm, "stream_structured"):
+            self._emit(tender_id, "draft", "Writing proposal" + (" revision" if previous else "") + "…")
+            draft = self.llm.stream_structured(ANALYST_SYSTEM, prompt, ProposalDraft,
+                                               lambda chunk: self.on_stream(tender_id, chunk))
+        else:
+            draft = self.llm.structured(ANALYST_SYSTEM, prompt, ProposalDraft)
         draft.tender_id = tender_id
         draft.revision = (previous.revision + 1) if previous else 1
         self.drafts[tender_id] = draft

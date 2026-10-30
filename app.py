@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -25,6 +27,21 @@ STATUS_LABEL = {"met": "✅ met", "partial": "🟡 partial", "gap": "❌ gap", "
 REC_LABEL = {"download": "⬇ download", "maybe": "🤔 maybe", "skip": "⏭ skip"}
 STEP_ICON = {"screen": "🗂️", "discover": "🔎", "extract": "📄", "qualify": "⚖️", "gap": "🚩", "rank": "🏆", "draft": "✍️",
              "verify": "🧪", "human": "🙋", "plan": "🧭", "think": "💭", "finish": "✅", "error": "⚠️"}
+
+SECTION_FIELD = re.compile(r'"(title|content)"\s*:\s*"((?:[^"\\]|\\.)*)', re.S)
+
+
+def draft_preview(partial_json: str) -> str:
+    """Readable markdown from a proposal draft whose JSON is still being written."""
+    out = []
+    for key, raw in SECTION_FIELD.findall(partial_json):
+        try:
+            text = json.loads(f'"{raw.rstrip(chr(92))}"')  # drop an escape cut off mid-stream
+        except json.JSONDecodeError:
+            text = raw
+        out.append(f"#### {text}" if key == "title" else text)
+    return "\n\n".join(out) + " ▌"
+
 
 st.set_page_config(page_title="TenderPilot", page_icon="🧭", layout="wide")
 st.title("🧭 TenderPilot")
@@ -64,11 +81,26 @@ if run_clicked:
     from run import build_pilot
 
     with st.status("TenderPilot is working…", expanded=True) as status:
+        live = {"box": None, "text": "", "shown": 0.0}  # the proposal being written right now
+
+        def on_stream(tender_id: str, chunk: str) -> None:
+            if live["box"] is None:
+                live.update(box=status.container(border=True).empty(), text="")
+            live["text"] += chunk
+            if time.monotonic() - live["shown"] > 0.25:
+                live["box"].markdown(draft_preview(live["text"]))
+                live["shown"] = time.monotonic()
+
         def on_event(kind: str, msg: str) -> None:
-            st.write(f"{STEP_ICON.get(kind, '•')} **{kind}** — {msg}")
+            if kind == "draft" and live["box"] is not None:  # draft finished: show it in full
+                live["box"].markdown(draft_preview(live["text"]).removesuffix(" ▌"))
+                live["box"] = None
+            # write into the status box explicitly: worker threads don't see the `with` block above
+            status.write(f"{STEP_ICON.get(kind, '•')} **{kind}** — {msg}")
 
         try:
             pilot = build_pilot(DATA_DIR, on_event=on_event)
+            pilot.on_stream = on_stream
             ctx = get_script_run_ctx()
             pilot.thread_init = lambda: add_script_run_ctx(ctx=ctx)  # parallel tools can write to the live log
             if pilot.company.unfinished():

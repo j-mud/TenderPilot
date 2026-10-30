@@ -104,6 +104,38 @@ def test_agent_runs_same_turn_tool_calls_in_parallel(tmp_path: Path):
     assert sum(r["step"] == "qualify" for r in pilot.store.rows("audit")) == len(tids)
 
 
+def test_draft_streams_and_falls_back(tmp_path: Path):
+    from agent.llm import LLM
+    from agent.schemas import ProposalDraft
+
+    t = "T101_citizen_ai_assistant"
+    pilot = make(tmp_path, FakeLLM())
+    chunks = []
+    pilot.on_stream = lambda tid, chunk: chunks.append((tid, chunk))
+    draft = pilot.draft_proposal(t)
+    assert chunks and all(tid == t for tid, _ in chunks)
+    assert ProposalDraft.model_validate_json("".join(c for _, c in chunks)).sections == draft.sections
+
+    # The real wrapper: a broken stream (error or bad JSON) falls back to the normal call.
+    good = '{"tender_id": "T", "sections": [{"title": "Executive summary", "content": "Hi"}]}'
+    llm = LLM.__new__(LLM)
+    llm.complete = lambda system, prompt, max_tokens=0: good
+    seen = []
+
+    def streams(text):
+        def fake(system, prompt, on_text, max_tokens=0):
+            on_text(text[:10])
+            if text == "boom":
+                raise ConnectionError("stream dropped")
+            return text
+        return fake
+
+    for streamed in (good, "boom", '{"tender_id": "T", "sections": [{"title": '):
+        llm.stream_complete = streams(streamed)
+        assert llm.stream_structured("sys", "prompt", ProposalDraft, seen.append).sections[0].content == "Hi"
+    assert seen
+
+
 def _make_pdf(path: Path, pages: list[str]) -> None:
     import pymupdf as fitz
 
@@ -158,7 +190,7 @@ if __name__ == "__main__":
 
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
-               test_real_style_pack_long_pdf_hijri):
+               test_draft_streams_and_falls_back, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
             fn(Path(d))
             print("PASS", fn.__name__)
