@@ -92,6 +92,12 @@ network. (The setting is on the command line, not in `.streamlit/config.toml`, b
 with the cloud deployment, which must be reachable.) The app does not open a browser tab itself.
 If the API or Wi-Fi fails during a demo, switch on **Load backup run** in the sidebar to show the saved run in `demo_backup/`.
 
+To analyze one tender of your own, pick **Upload a tender** as the data set. Add all of the tender's files
+(booklet, appendices, BOQ; PDF, DOCX, XLSX, MD or TXT; up to 25 MB each and about 150 pages in total), optionally
+a title, deadline (Gregorian or Hijri) and value, choose the company profile, and press **Analyze this tender**.
+Files are kept in a temporary folder for your browser session (`output/uploads/`, never committed) and are
+sent to the AI provider for analysis.
+
 Other commands:
 - `python run.py` runs the autonomous agent from the CLI, on the sample data
 - `python run.py --mode pipeline` runs the fixed-order fallback

@@ -12,14 +12,17 @@ import json
 import os
 import re
 import time
+import uuid
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+from agent import uploads
 from agent.documents import normalize_deadline
 from agent.run_budget import RunBudget
+from agent.uploads import MAX_FILE_MB, MAX_PAGES
 from eval import score
 from run import DEFAULT_GOAL, output_dir
 
@@ -48,6 +51,13 @@ DATA_SETS = sorted(p.name for p in (ROOT / "data").iterdir()
 # Deployed: cap live runs so a shared link can't run up the API bill (state in output/, not committed)
 BUDGET = RunBudget(ROOT / "output" / "run_budget.json", max_per_day=int(secret("MAX_RUNS_PER_DAY") or 10),
                    cooldown_s=120) if DEPLOYED else None
+# "Upload a tender": files go to output/uploads/<session>/ (git-ignored), checked against a chosen company
+UPLOAD = "Upload a tender"
+UPLOADS = ROOT / "output" / "uploads"
+SAMPLE_COMPANY = ROOT / "data" / "sample" / "company"
+PROFILES = {"Falak AI (fictional sample)": SAMPLE_COMPANY}
+if not DEPLOYED:  # my_company is only a template in the public repo
+    PROFILES["my_company"] = ROOT / "data" / "my_company" / "company"
 
 DECISION_LABEL = {"BID": "🟢 Bid", "CONDITIONAL_BID": "🟡 Conditional bid", "NO_BID": "🔴 No bid"}
 STATUS_LABEL = {"met": "✅ met", "partial": "🟡 partial", "gap": "❌ gap", "unknown": "❔ unknown"}
@@ -116,17 +126,35 @@ st.caption("Autonomous agent: screens tenders, decides bid / no-bid, drafts and 
 # ------------------------------------------------------------------ sidebar
 with st.sidebar:
     st.header("Run the agent")
-    data_set = st.selectbox("Data set", DATA_SETS, index=DATA_SETS.index("sample") if "sample" in DATA_SETS else 0,
-                            help="sample = fictional demo data · my_company = your real company and tenders")
-    DATA_DIR = ROOT / "data" / data_set
-    use_backup = data_set == "sample" and (BACKUP / "results.json").exists() and st.toggle(
-        "Load backup run", value=DEPLOYED,  # the public demo opens on the saved run
-        help="Show a saved run instantly, with no API calls (if the API or Wi-Fi fails).")
-    OUT = BACKUP if use_backup else output_dir(DATA_DIR)
+    data_set = st.selectbox("Data set", DATA_SETS + [UPLOAD], index=DATA_SETS.index("sample") if "sample" in DATA_SETS else 0,
+                            help="sample = fictional demo data · my_company = your real company and tenders · "
+                                 "Upload a tender = analyze one tender pack of your own")
+    uploading = data_set == UPLOAD
+    if uploading:
+        # one temporary folder per browser session, never inside data/
+        session_dir = UPLOADS / st.session_state.setdefault("upload_id", uuid.uuid4().hex[:12])
+        files = st.file_uploader("Tender documents", type=["pdf", "docx", "xlsx", "md", "txt"], accept_multiple_files=True,
+                                 help="All files together are one tender: booklet, appendices, BOQ.")
+        up_title = st.text_input("Tender title (optional)")
+        up_deadline = st.text_input("Deadline (optional)", placeholder="2026-12-10 or 1448-06-24 هـ")
+        up_value = st.text_input("Estimated value, SAR (optional)", placeholder="3800000")
+        profile = st.radio("Company profile", list(PROFILES), help="The company whose files the tender is checked against.")
+        COMPANY_DIR = PROFILES[profile]
+        st.caption(f"Uploaded files are sent to the AI provider ({os.getenv('LLM_PROVIDER', 'anthropic')}) for analysis. "
+                   f"Limits: {MAX_FILE_MB} MB per file, about {MAX_PAGES} pages per tender.")
+        run_clicked = st.button("🔍 Analyze this tender", type="primary", width="stretch", disabled=not files)
+        DATA_DIR, OUT, use_backup = session_dir, session_dir / "results", False
+    else:
+        DATA_DIR = ROOT / "data" / data_set
+        COMPANY_DIR = DATA_DIR / "company"
+        use_backup = data_set == "sample" and (BACKUP / "results.json").exists() and st.toggle(
+            "Load backup run", value=DEPLOYED,  # the public demo opens on the saved run
+            help="Show a saved run instantly, with no API calls (if the API or Wi-Fi fails).")
+        OUT = BACKUP if use_backup else output_dir(DATA_DIR)
+        goal = st.text_area("Goal", DEFAULT_GOAL, height=140)
+        mode = st.radio("Mode", ["agent", "pipeline"], help="agent = the model plans its own steps; pipeline = fixed order (fallback)")
+        run_clicked = st.button("▶ Run TenderPilot", type="primary", width="stretch", disabled=use_backup)
     RESULTS = OUT / "results.json"
-    goal = st.text_area("Goal", DEFAULT_GOAL, height=140)
-    mode = st.radio("Mode", ["agent", "pipeline"], help="agent = the model plans its own steps; pipeline = fixed order (fallback)")
-    run_clicked = st.button("▶ Run TenderPilot", type="primary", width="stretch", disabled=use_backup)
     st.divider()
     st.caption(f"Provider: {os.getenv('LLM_PROVIDER', 'anthropic')} · Model: {os.getenv('LLM_MODEL', 'default')}")
     if use_backup:
@@ -136,25 +164,36 @@ with st.sidebar:
     if BUDGET:
         st.caption(f"Live runs left today: {BUDGET.remaining()} of {BUDGET.max_per_day} (one every 2 minutes).")
 
-if data_set == "sample":
-    st.caption("Sample data set: all companies and tenders are fictional.")
+if COMPANY_DIR == SAMPLE_COMPANY:
+    st.caption("Checked against the fictional sample company (Falak AI)." if uploading
+               else "Sample data set: all companies and tenders are fictional.")
 else:
     from agent.documents import CompanyKnowledge
 
-    todo = CompanyKnowledge(DATA_DIR / "company").unfinished()
+    todo = CompanyKnowledge(COMPANY_DIR).unfinished()
     if todo:
-        st.warning(f"Fill in the TODO placeholders in data/{data_set}/company/ first: {', '.join(todo)}. "
-                   f"See data/{data_set}/HOW_TO_USE.md.")
+        st.warning(f"Fill in the TODO placeholders in {COMPANY_DIR.relative_to(ROOT)}/ first: {', '.join(todo)}. "
+                   f"See data/my_company/HOW_TO_USE.md.")
 
 # ---------------------------------------------------------------------- run
+if run_clicked and uploading:  # check and save the pack first: a rejected upload costs nothing
+    try:
+        uploads.prune(UPLOADS)
+        DATA_DIR, upload_id = uploads.save_pack(session_dir, [(f.name, f.getvalue()) for f in files],
+                                                uploads.build_meta(up_title, up_deadline, up_value))
+    except uploads.UploadError as err:
+        st.error(str(err))
+        run_clicked = False
 blocked = BUDGET.try_start() if run_clicked and BUDGET else None
 if blocked:
-    st.warning(f"{blocked} Switch on **Load backup run** in the sidebar to see a complete saved run right away.")
+    st.warning(f"{blocked} " + ("Try again later, or pick the **sample** data set and switch on **Load backup run** "
+                                "to see a complete saved run." if uploading else
+                                "Switch on **Load backup run** in the sidebar to see a complete saved run right away."))
     run_clicked = False
 if run_clicked:
     from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 
-    from agent.loop import run_agent, run_pipeline
+    from agent.loop import run_agent, run_pipeline, run_single
     from run import build_pilot
 
     with st.status("TenderPilot is working…", expanded=True) as status:
@@ -176,13 +215,16 @@ if run_clicked:
             status.write(f"{STEP_ICON.get(kind, '•')} **{kind}** — {msg}")
 
         try:
-            pilot = build_pilot(DATA_DIR, on_event=on_event)
+            pilot = build_pilot(DATA_DIR, on_event=on_event, company_dir=COMPANY_DIR, out_dir=OUT)
             pilot.on_stream = on_stream
             ctx = get_script_run_ctx()
             pilot.thread_init = lambda: add_script_run_ctx(ctx=ctx)  # parallel tools can write to the live log
             if pilot.company.unfinished():
                 st.warning(f"Company files still contain TODO placeholders: {', '.join(pilot.company.unfinished())}")
-            summary = (run_agent if mode == "agent" else run_pipeline)(pilot, goal)
+            if uploading:
+                summary = run_single(pilot, upload_id)
+            else:
+                summary = (run_agent if mode == "agent" else run_pipeline)(pilot, goal)
             pilot.save(OUT)
             status.update(label=f"Done. {summary[:120]}", state="complete", expanded=False)
         except Exception as err:
@@ -194,8 +236,12 @@ if run_clicked:
                 BUDGET.finish()
 
 if not RESULTS.exists():
-    st.info(f"No results yet for **{data_set}**. Add your API key to .env and press **Run TenderPilot**. "
-            "To use real tenders, see data/my_company/HOW_TO_USE.md.")
+    if uploading:
+        st.info("Upload a tender's files in the sidebar (booklet, appendices, BOQ: all one tender) "
+                "and press **Analyze this tender**.")
+    else:
+        st.info(f"No results yet for **{data_set}**. Add your API key to .env and press **Run TenderPilot**. "
+                "To use real tenders, see data/my_company/HOW_TO_USE.md.")
     st.stop()
 
 results = json.loads(RESULTS.read_text(encoding="utf-8"))
@@ -252,7 +298,7 @@ rank_rows = []
 for r in results["ranking"]:
     e = exts.get(r["tender_id"], {})
     rank_rows.append({
-        "Tender": r["tender_id"], "Title": short(english_part(e.get("title", "")), 54), "Deadline": e.get("deadline", ""),
+        "Tender": short(r["tender_id"], 27), "Title": short(english_part(e.get("title", "")), 54), "Deadline": e.get("deadline", ""),
         "Decision": DECISION_LABEL[r["decision"]], "Fit": r["fit_score"], "Blockers": len(r["blockers"]),
     })
 st.dataframe(pd.DataFrame(rank_rows), hide_index=True, width="stretch", column_config={
@@ -268,7 +314,7 @@ if results["human_questions"]:
 
 # ---------------------------------------------------------------- per tender
 st.subheader("Tender details")
-prefixes = [r["tender_id"].split("_")[0] for r in results["ranking"]]
+prefixes = [r["tender_id"].split("_")[0].replace("UPLOAD", "Uploaded tender") for r in results["ranking"]]
 tab_ids = [p if prefixes.count(p) == 1 else r["tender_id"] for p, r in zip(prefixes, results["ranking"])]  # "T101"
 tabs = st.tabs([f"{t} · {DECISION_LABEL[r['decision']]}" for t, r in zip(tab_ids, results["ranking"])] + ["Audit log"])
 for tab, r in zip(tabs, results["ranking"]):

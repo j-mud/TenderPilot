@@ -3,6 +3,7 @@
 #   streamlit run app.py --server.address localhost
 [server]
 headless = true
+maxUploadSize = 25  # MB per file; matches the app's own upload limit
 
 [browser]
 gatherUsageStats = false
