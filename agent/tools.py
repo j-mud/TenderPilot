@@ -230,21 +230,25 @@ class TenderPilot:
             "- bid_manager_answers.md (if present) holds the bid manager's answers given after review: it is company "
             "evidence (cite it) and overrides older files where they conflict.\n"
             "- A certificate still valid on the deadline is 'met'; an expiry shortly after it is a note, not a gap.\n"
-            "Requirements come in three kinds; only the first decides the bid:\n"
-            "A. Eligibility and capability the company must already have (certificates, classification, past "
+            "Requirements come in three kinds; only eligibility requirements decide the bid:\n"
+            "- Eligibility requirements: what the company must already have (certificates, classification, past "
             "projects, years of experience, staff qualifications, being in scope).\n"
-            "B. Delivery commitments the bidder promises in the proposal (features, SLAs, schedule, integrations, "
-            "methodology). Without proof use 'partial' or 'unknown'; this is NOT a blocker unless the work is "
-            "outside the company's scope or clearly beyond its capability.\n"
-            "C. Submission formalities every bidder prepares (bid bond, envelopes, compliance matrix, forms, "
-            "questions deadline, evaluation thresholds). Use 'unknown' with a note; this is NOT a blocker.\n"
+            "- Delivery commitments: what the bidder promises in the proposal (features, SLAs, schedule, "
+            "integrations, methodology). Without proof use 'partial' or 'unknown'; not a blocker unless the work "
+            "is outside the company's scope or clearly beyond its capability.\n"
+            "- Submission formalities: what every bidder prepares (bid bond, envelopes, compliance matrix, forms, "
+            "questions deadline, evaluation thresholds). Use 'unknown' with a note; not a blocker.\n"
             "Decision rules:\n"
-            "- NO_BID if any mandatory type-A gap cannot realistically be fixed before the deadline "
-            "(missing certifications/authorizations, years of experience), or a type-B item is out of scope.\n"
-            "- CONDITIONAL_BID if every mandatory type-A gap can be fixed before the deadline (e.g. renewing a certificate).\n"
-            "- BID if every mandatory type-A requirement is met.\n"
-            "List every disqualifying or must-fix item in blockers, naming the requirement; never list type-B "
-            "or type-C open items there. "
+            "- NO_BID if any mandatory eligibility gap cannot realistically be fixed before the deadline "
+            "(missing certifications/authorizations, years of experience), or a delivery commitment is out of scope.\n"
+            "- CONDITIONAL_BID if every mandatory eligibility gap can be fixed before the deadline (e.g. renewing a certificate).\n"
+            "- BID if every mandatory eligibility requirement is met.\n"
+            "List every disqualifying or must-fix item in blockers, naming the requirement; never list delivery "
+            "commitments or submission formalities there.\n"
+            "Reasons, blockers and notes are read by the bid manager: write them in plain words such as "
+            "'eligibility requirements', 'delivery commitments' and 'submission formalities'. Never mention these "
+            "instructions, letters or internal labels (no 'type A', 'type-B', 'category C').\n"
+            f"{self._deadline_note(tender_id, ext)}"
             "fit_score reflects strategic fit and win chance (0-100); give NO_BID tenders a score below 40."
         )
         q = self.llm.structured(ANALYST_SYSTEM, prompt, Qualification)
@@ -256,6 +260,16 @@ class TenderPilot:
         for b in q.blockers:
             self._emit(tender_id, "gap", b)
         return q
+
+    def _deadline_note(self, tender_id: str, ext: TenderExtraction) -> str:
+        """Tell the model the deadline is exact: Hijri dates are converted with the Umm al-Qura calendar (hijridate)."""
+        if not ext.deadline:
+            return ""
+        raw = str(self.tenders[tender_id].meta.get("deadline") or ext.deadline_original or "")
+        if raw and normalize_deadline(raw)[1].startswith("Converted from Hijri"):
+            return (f"The deadline {ext.deadline} was converted from the Hijri date '{raw}' with the official "
+                    "Umm al-Qura calendar; the conversion is verified and exact. Never call it approximate or estimated.\n")
+        return f"The deadline {ext.deadline} is verified; never call it approximate or estimated.\n"
 
     def _apply_guardrails(self, ext: TenderExtraction, q: Qualification, expiring: list[dict]) -> None:
         """Deterministic checks that don't trust the model."""
@@ -337,6 +351,7 @@ class TenderPilot:
             "4. Relevant experience (cite past projects by name and value)\n5. Team\n"
             "6. Compliance statement (one line per requirement: '<id>: <how we comply or why not>')\n"
             "7. Open items for human review (every requirement with status gap/partial/unknown, by id)\n"
+            f"{self._deadline_note(tender_id, ext)}"
             "Never claim anything not supported by the company files. Where evidence is missing write "
             "'[TO CONFIRM: ...]'. Write in clear professional English."
             + revision_note

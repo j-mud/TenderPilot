@@ -178,6 +178,33 @@ def test_bid_manager_answer_requalifies_and_drafts(tmp_path: Path):
     assert vague.company.add_answer(t, "q", "Zakat and GOSI renewed until 2027-12-01") == []  # two certificates: ambiguous
 
 
+def test_prompts_use_plain_words_and_verified_hijri_deadline(tmp_path: Path):
+    import shutil
+
+    llm, prompts = FakeLLM(), {}
+    original = llm.structured
+
+    def spy(system, prompt, schema):
+        prompts[schema.__name__] = prompt
+        return original(system, prompt, schema)
+
+    llm.structured = spy
+    data = tmp_path / "data"
+    shutil.copytree(SAMPLE / "company", data / "company")
+    (data / "tenders").mkdir()
+    (data / "tenders" / "T300.md").write_text("Title: Archive OCR\n3.1 Valid Commercial Registration.\n", encoding="utf-8")
+    (data / "tenders" / "T300.meta.json").write_text('{"deadline": "1448-06-24 هـ"}', encoding="utf-8")
+    pilot = make(tmp_path, llm, data)
+    pilot.qualify_tender("T300")
+    pilot.draft_proposal("T300")
+    qualify, draft = prompts["Qualification"], prompts["ProposalDraft"]
+    for label in ("type-A", "type-B", "type-C", "A. Eligibility"):
+        assert label not in qualify.split("Reasons, blockers and notes")[0], label  # no internal labels to copy
+    assert "plain words" in qualify and "eligibility requirements" in qualify
+    for p in (qualify, draft):  # Hijri deadline: exact, converted with Umm al-Qura
+        assert "2026-12-04" in p and "Umm al-Qura" in p and "Never call it approximate" in p
+
+
 def test_run_budget_limits_live_runs(tmp_path: Path):
     from agent.run_budget import RunBudget
 
@@ -350,6 +377,7 @@ if __name__ == "__main__":
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
                test_draft_streams_and_falls_back, test_bid_manager_answer_requalifies_and_drafts,
+               test_prompts_use_plain_words_and_verified_hijri_deadline,
                test_run_budget_limits_live_runs,
                test_upload_pack_single_tender_flow, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:

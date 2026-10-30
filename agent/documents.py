@@ -170,7 +170,7 @@ def normalize_deadline(value: str) -> tuple[str, str]:
             from hijridate import Hijri
 
             g = Hijri(y, mo, d).to_gregorian()
-            return g.isoformat(), f"Converted from Hijri {y}-{mo:02d}-{d:02d}"
+            return g.isoformat(), f"Converted from Hijri {y}-{mo:02d}-{d:02d} (Umm al-Qura calendar)"
         except Exception as err:
             return "", f"Invalid Hijri date '{value}': {err}"
     try:
