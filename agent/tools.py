@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
 from typing import Callable
@@ -33,6 +35,7 @@ from .schemas import (
 from .store import Store
 
 EventFn = Callable[[str, str], None]
+MAX_WORKERS = 5
 
 ANALYST_SYSTEM = (
     "You are TenderPilot, a meticulous bid analyst for a Saudi technology company. "
@@ -55,9 +58,18 @@ class TenderPilot:
     def __init__(self, llm: LLM, data_dir: Path, store: Store, on_event: EventFn | None = None):
         self.llm = llm
         self.store = store
-        self.on_event = on_event or (lambda kind, msg: None)
         self.data_dir = data_dir
         self.tenders: dict[str, Tender] = load_tenders(data_dir / "tenders")
+        # Tools may run in worker threads: keep events in one piece, extract each tender once.
+        event_fn, event_lock = on_event or (lambda kind, msg: None), threading.Lock()
+
+        def locked_event(kind: str, msg: str) -> None:
+            with event_lock:
+                event_fn(kind, msg)
+
+        self.on_event = locked_event
+        self.thread_init: Callable[[], None] | None = None  # e.g. lets Streamlit write from workers
+        self._tender_locks = {tid: threading.Lock() for tid in self.tenders}
         self.company = CompanyKnowledge(data_dir / "company")
         self.listings = load_listings(data_dir / "listings.csv")
         self.shortlist: list[ListingScore] = []
@@ -75,6 +87,13 @@ class TenderPilot:
     def _require(self, tender_id: str) -> None:
         if tender_id not in self.tenders:
             raise KeyError(f"Unknown tender_id '{tender_id}'. Known: {list(self.tenders)}")
+
+    def parallel(self, fn: Callable, items: list) -> list:
+        """fn(item) for every item, up to MAX_WORKERS at a time; results in input order."""
+        if len(items) <= 1:
+            return [fn(x) for x in items]
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS, initializer=self.thread_init) as pool:
+            return list(pool.map(fn, items))
 
     # ------------------------------------------------------------------ tools
     def list_tenders(self) -> list[dict]:
@@ -109,6 +128,12 @@ class TenderPilot:
 
     def extract_requirements(self, tender_id: str) -> TenderExtraction:
         self._require(tender_id)
+        with self._tender_locks[tender_id]:  # a parallel qualify of the same tender waits, then reuses it
+            if tender_id in self.extractions:
+                return self.extractions[tender_id]
+            return self._extract(tender_id)
+
+    def _extract(self, tender_id: str) -> TenderExtraction:
         tender = self.tenders[tender_id]
         chunks = chunk_text(tender.text)
         instructions = (
@@ -180,7 +205,7 @@ class TenderPilot:
 
     def qualify_tender(self, tender_id: str) -> Qualification:
         self._require(tender_id)
-        ext = self.extractions.get(tender_id) or self.extract_requirements(tender_id)
+        ext = self.extract_requirements(tender_id)
         expiring = self.company.expiring_before(ext.deadline)
         facts = {
             "today": today().isoformat(),
@@ -273,7 +298,7 @@ class TenderPilot:
 
     def _ranking(self) -> list[dict]:
         order = {"BID": 0, "CONDITIONAL_BID": 1, "NO_BID": 2}
-        ranked = sorted(self.qualifications.values(), key=lambda q: (order[q.decision], -q.fit_score))
+        ranked = sorted(self.qualifications.values(), key=lambda q: (order[q.decision], -q.fit_score, q.tender_id))
         return [
             {"tender_id": q.tender_id, "decision": q.decision, "fit_score": q.fit_score, "blockers": q.blockers}
             for q in ranked
@@ -287,7 +312,7 @@ class TenderPilot:
 
     def draft_proposal(self, tender_id: str) -> ProposalDraft:
         self._require(tender_id)
-        ext = self.extractions.get(tender_id) or self.extract_requirements(tender_id)
+        ext = self.extract_requirements(tender_id)
         q = self.qualifications.get(tender_id) or self.qualify_tender(tender_id)
         previous = self.drafts.get(tender_id)
         report = self.verifications.get(tender_id)

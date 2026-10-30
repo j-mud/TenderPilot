@@ -58,6 +58,8 @@ else:
 
 # ---------------------------------------------------------------------- run
 if run_clicked:
+    from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
+
     from agent.loop import run_agent, run_pipeline
     from run import build_pilot
 
@@ -67,6 +69,8 @@ if run_clicked:
 
         try:
             pilot = build_pilot(DATA_DIR, on_event=on_event)
+            ctx = get_script_run_ctx()
+            pilot.thread_init = lambda: add_script_run_ctx(ctx=ctx)  # parallel tools can write to the live log
             if pilot.company.unfinished():
                 st.warning(f"Company files still contain TODO placeholders: {', '.join(pilot.company.unfinished())}")
             summary = (run_agent if mode == "agent" else run_pipeline)(pilot, goal)

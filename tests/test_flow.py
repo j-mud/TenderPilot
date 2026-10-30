@@ -79,6 +79,31 @@ def test_agent_loop_recovers_from_bad_tool_call(tmp_path: Path):
     assert pilot.verifications[t].passed
 
 
+def test_agent_runs_same_turn_tool_calls_in_parallel(tmp_path: Path):
+    import threading
+
+    llm = FakeLLM()
+    pilot = make(tmp_path, llm)
+    extracted, threads, original = [], set(), llm.structured
+
+    def tracking(system, prompt, schema):
+        threads.add(threading.get_ident())
+        if schema.__name__ == "TenderExtraction":
+            extracted.append(prompt)
+        return original(system, prompt, schema)
+
+    llm.structured = tracking
+    tids = list(pilot.tenders)
+    # extract + qualify of the same tender in one turn must extract it only once
+    llm.script = [[("extract_requirements", {"tender_id": tids[0]})] + [("qualify_tender", {"tender_id": t}) for t in tids],
+                  [("finish", {"briefing": "done"})]]
+    run_agent(pilot, "test goal")
+    assert set(pilot.qualifications) == set(tids)
+    assert len(extracted) == len(tids)
+    assert len(threads) > 1
+    assert sum(r["step"] == "qualify" for r in pilot.store.rows("audit")) == len(tids)
+
+
 def _make_pdf(path: Path, pages: list[str]) -> None:
     import pymupdf as fitz
 
@@ -132,7 +157,8 @@ if __name__ == "__main__":
     import tempfile
 
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
-               test_agent_loop_recovers_from_bad_tool_call, test_real_style_pack_long_pdf_hijri):
+               test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
+               test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
             fn(Path(d))
             print("PASS", fn.__name__)

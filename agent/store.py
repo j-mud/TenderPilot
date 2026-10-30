@@ -1,7 +1,8 @@
-"""Opportunity tracker and audit log (SQLite)."""
+"""Opportunity tracker and audit log (SQLite). Safe to call from several threads."""
 from __future__ import annotations
 
 import sqlite3
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +11,7 @@ class Store:
     def __init__(self, path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(path, check_same_thread=False)
+        self._lock = threading.Lock()  # one shared connection: serialize every statement + commit
         self.db.executescript(
             """
             CREATE TABLE IF NOT EXISTS opportunities (
@@ -25,22 +27,27 @@ class Store:
         )
 
     def reset(self) -> None:
-        self.db.executescript("DELETE FROM opportunities; DELETE FROM actions; DELETE FROM audit;")
-        self.db.commit()
+        with self._lock:
+            self.db.executescript("DELETE FROM opportunities; DELETE FROM actions; DELETE FROM audit;")
+            self.db.commit()
 
     @staticmethod
     def _now() -> str:
         return datetime.now().isoformat(timespec="seconds")
 
+    def _write(self, sql: str, params: tuple) -> None:
+        with self._lock:
+            self.db.execute(sql, params)
+            self.db.commit()
+
     def log(self, tender_id: str, step: str, detail: str) -> None:
-        self.db.execute(
+        self._write(
             "INSERT INTO audit (ts, tender_id, step, detail) VALUES (?,?,?,?)",
             (self._now(), tender_id, step, detail),
         )
-        self.db.commit()
 
     def upsert_opportunity(self, tender_id, title, deadline, decision=None, fit_score=None, status="new"):
-        self.db.execute(
+        self._write(
             """INSERT INTO opportunities (tender_id, title, deadline, decision, fit_score, status, updated_at)
                VALUES (?,?,?,?,?,?,?)
                ON CONFLICT(tender_id) DO UPDATE SET
@@ -50,16 +57,15 @@ class Store:
                  status=excluded.status, updated_at=excluded.updated_at""",
             (tender_id, title, deadline, decision, fit_score, status, self._now()),
         )
-        self.db.commit()
 
     def add_action(self, tender_id: str, action: str, owner: str = "human") -> None:
-        self.db.execute(
+        self._write(
             "INSERT INTO actions (tender_id, action, owner, created_at) VALUES (?,?,?,?)",
             (tender_id, action, owner, self._now()),
         )
-        self.db.commit()
 
     def rows(self, table: str) -> list[dict]:
-        cur = self.db.execute(f"SELECT * FROM {table}")  # table names are internal constants
-        cols = [c[0] for c in cur.description]
-        return [dict(zip(cols, r)) for r in cur.fetchall()]
+        with self._lock:
+            cur = self.db.execute(f"SELECT * FROM {table}")  # table names are internal constants
+            cols = [c[0] for c in cur.description]
+            return [dict(zip(cols, r)) for r in cur.fetchall()]

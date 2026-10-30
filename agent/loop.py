@@ -18,6 +18,8 @@ Work like an experienced bid manager:
    downloading in your final briefing.
 1. list_tenders to see which full tender documents are available.
 2. extract_requirements and qualify_tender for EVERY tender (skip nothing; problems hide in appendices).
+   Save time: call extract_requirements for ALL tenders in one turn, then qualify_tender for ALL
+   tenders in the next turn. Calls made in the same turn run in parallel.
 3. rank_opportunities.
 4. For the best BID or CONDITIONAL_BID tender: draft_proposal, then verify_proposal.
    If verification fails, call draft_proposal again (it revises using the issues), then verify again.
@@ -71,6 +73,30 @@ def _summarize(name: str, result) -> str:
     return json.dumps(result, ensure_ascii=False) if not isinstance(result, str) else result
 
 
+PARALLEL_TOOLS = {"extract_requirements", "qualify_tender"}  # independent per tender
+
+
+def _call(pilot: TenderPilot, call) -> str:
+    try:
+        return _summarize(call.name, getattr(pilot, call.name)(**call.args))
+    except Exception as err:  # report errors back so the agent can recover
+        pilot.on_event("error", f"{call.name}: {err}")
+        return f"ERROR: {err}"
+
+
+def _run_calls(pilot: TenderPilot, calls: list) -> list:
+    """Run one turn's tool calls in order; neighbouring per-tender calls run in parallel."""
+    outputs, i = [], 0
+    while i < len(calls):
+        j = i + 1
+        if calls[i].name in PARALLEL_TOOLS:
+            while j < len(calls) and calls[j].name in PARALLEL_TOOLS:
+                j += 1
+        outputs += pilot.parallel(lambda c: _call(pilot, c), calls[i:j])
+        i = j
+    return list(zip(calls, outputs))
+
+
 def run_agent(pilot: TenderPilot, goal: str, max_steps: int = 40) -> str:
     pilot.on_event("plan", f"Goal: {goal}")
     messages: list = [{"role": "user", "content": f"Today is {today().isoformat()}.\n\nGOAL: {goal}"}]
@@ -82,19 +108,13 @@ def run_agent(pilot: TenderPilot, goal: str, max_steps: int = 40) -> str:
         if not turn.tool_calls:
             messages.append({"role": "user", "content": "Continue. Use the tools, and call finish when done."})
             continue
-        results = []
-        for call in turn.tool_calls:
-            if call.name == "finish":
-                briefing = call.args.get("briefing", "")
-                pilot.on_event("finish", briefing)
-                return briefing
-            try:
-                fn = getattr(pilot, call.name)
-                output = _summarize(call.name, fn(**call.args))
-            except Exception as err:  # report errors back so the agent can recover
-                output = f"ERROR: {err}"
-                pilot.on_event("error", f"{call.name}: {err}")
-            results.append((call, output))
+        names = [c.name for c in turn.tool_calls]
+        finish = names.index("finish") if "finish" in names else None
+        results = _run_calls(pilot, turn.tool_calls[:finish])
+        if finish is not None:
+            briefing = turn.tool_calls[finish].args.get("briefing", "")
+            pilot.on_event("finish", briefing)
+            return briefing
         messages.extend(pilot.llm.tool_results_message(results))
     pilot.on_event("finish", "Stopped: step limit reached.")
     return "Step limit reached."
@@ -104,8 +124,7 @@ def run_pipeline(pilot: TenderPilot, goal: str = "", max_revisions: int = 2) -> 
     pilot.on_event("plan", "Running fixed pipeline: screen -> extract -> qualify -> rank -> draft -> verify")
     if pilot.listings:
         pilot.screen_listings()
-    for t in pilot.list_tenders():
-        pilot.qualify_tender(t["tender_id"])  # extracts first
+    pilot.parallel(pilot.qualify_tender, [t["tender_id"] for t in pilot.list_tenders()])  # extracts first
     ranking = pilot.rank_opportunities()
     best = next((r for r in ranking if r["decision"] != "NO_BID"), None)
     if best is None:
