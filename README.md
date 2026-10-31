@@ -14,6 +14,17 @@ It runs on two data sets:
 - `data/my_company/`: a template for a **real** company and **real** tenders downloaded from Etimad
   (see [`data/my_company/HOW_TO_USE.md`](data/my_company/HOW_TO_USE.md))
 
+## Tech stack
+
+- **Python 3.11**
+- **Claude API** through the `anthropic` SDK (model `claude-sonnet-5-5`); switchable to any OpenAI-compatible model
+- **Streamlit** for the web app
+- **Pydantic** to validate every structured output from the model
+- **PyMuPDF**, **python-docx** and **openpyxl** to read tender documents (PDF, Word, Excel) and write the proposal in Word
+- **hijridate** for Hijri deadlines (Umm al-Qura calendar)
+- **SQLite** for the tender tracker and audit log
+- Deployed on **Streamlit Community Cloud**
+
 ## How it works
 
 ```
@@ -83,11 +94,22 @@ Run times vary with API load.
 |---|---|---|
 | ![Streaming draft](docs/ui_streaming.png) | ![Overview](docs/ui_overview.png) | ![Details](docs/ui_details.png) |
 
+## Setup
+
+You need **Python 3.11** and an **Anthropic API key**.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env             # Windows: copy .env.example .env
+```
+
+Then open `.env` and set `ANTHROPIC_API_KEY` to your key. The key is only read from `.env`, which is never committed.
+
 ## How to run
 
 ```bash
-python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-cp .env.example .env      # then add your ANTHROPIC_API_KEY to .env
 streamlit run app.py --server.address localhost   # then open http://localhost:8501
 ```
 
@@ -117,7 +139,9 @@ Other commands:
 Works with Claude (default) or any OpenAI-compatible endpoint: set `LLM_PROVIDER=openai`
 and `OPENAI_BASE_URL` in `.env`.
 
-## Tests (no API key needed)
+## How to test
+
+**1. Offline tests (no API key needed):**
 
 ```bash
 python tests/test_flow.py
@@ -128,6 +152,20 @@ guardrails catch its mistakes (expired Zakat certificate, missing evidence, a fo
 requirement that forces a redraft, a bad tool call the agent recovers from), that parallel tool
 calls extract each tender only once, that a broken draft stream falls back to a normal call, and that a
 30-page multi-file PDF pack with a clause hidden in its appendix and a Hijri deadline is read correctly.
+
+**2. Accuracy against the answer key (needs the API key):**
+
+```bash
+python run.py      # a real run on the sample data
+python eval.py     # scores that run against answer_key.json
+```
+
+`eval.py` reports the share of correct BID / CONDITIONAL / NO_BID decisions, requirement recall and traps caught
+(see [Results](#results)).
+
+**3. Uploads with unseen tenders:** in the app, pick **Upload a tender**, keep the **sample** company profile, and
+upload the fictional tenders in [test_tenders/](test_tenders/README.md) one at a time (U3 is two files, uploaded
+together). Compare the decisions with [test_tenders/EXPECTED_RESULTS.md](test_tenders/EXPECTED_RESULTS.md).
 
 ## Project layout
 
@@ -154,6 +192,13 @@ docs/           screenshots
 
 ## Next steps
 
-- Connect a live tender feed (with the platform's permission) instead of copying listings
-- Add buying-signal research (news, budgets) to rank opportunities before tenders are published
-- Arabic proposal output
+- **Run on HUMAIN's in-Kingdom models**, so tender and company data stay in Saudi Arabia (the model is already
+  switchable through the OpenAI-compatible setting)
+- **Arabic proposals**, written in the tender's language
+- **A pilot on real Etimad tenders** with a registered Saudi company and its real documents
+- **An approved tender data feed** instead of copying listings by hand
+- **Accounts and team review**: sign-in, roles, and a bid manager approving each proposal before submission
+
+## Built with
+
+Designed by me (j-mud). Built with [Claude Code](https://claude.com/claude-code) as a coding assistant.
