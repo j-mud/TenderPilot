@@ -201,4 +201,4 @@ docs/           screenshots
 
 ## Built with
 
-Designed by me (j-mud). Built with [Claude Code](https://claude.com/claude-code) as a coding assistant.
+Designed by me (Aljohara Almudaiheem). Built with [Claude Code](https://claude.com/claude-code) as a coding assistant.
