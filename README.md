@@ -61,6 +61,10 @@ requirement recall and traps caught.
 The public app opens on a saved run of the fictional sample data. Visitors can switch off **Load backup run** to
 start a live run; live runs are limited to 10 per day, one at a time, at most one every 2 minutes.
 
+To try **Upload a tender** with documents the agent has never seen, use the four fictional tenders in
+[test_tenders/](test_tenders/README.md) (two in Arabic; U3 is split over two files). The expected results are in
+[test_tenders/EXPECTED_RESULTS.md](test_tenders/EXPECTED_RESULTS.md).
+
 ## Results
 
 Sample data (5 tenders, 10 listings), scored by `eval.py` against `answer_key.json`, model `claude-sonnet-5-5`:

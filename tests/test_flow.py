@@ -205,6 +205,26 @@ def test_prompts_use_plain_words_and_verified_hijri_deadline(tmp_path: Path):
         assert "2026-12-04" in p and "Umm al-Qura" in p and "Never call it approximate" in p
 
 
+def test_test_tenders_folder_is_never_loaded(tmp_path: Path):
+    # test_tenders/ holds fictional packs for trying the upload feature by hand; runs and the eval must never see them.
+    import json
+
+    names = ["test_tenders"] + [p.stem for p in (ROOT / "test_tenders").glob("U*")]
+    llm, prompts = FakeLLM(), []
+    original = llm.structured
+
+    def spy(system, prompt, schema):
+        prompts.append(system + prompt)
+        return original(system, prompt, schema)
+
+    llm.structured = spy
+    pilot = make(tmp_path, llm)
+    run_pipeline(pilot)
+    assert not any(p.lower().startswith("u") for p in pilot.tenders)
+    for text in prompts + [json.dumps(json.loads((ROOT / "answer_key.json").read_text(encoding="utf-8")))]:
+        assert not any(n in text for n in names)
+
+
 def test_section_titles_are_clean_in_draft_and_docx(tmp_path: Path):
     from docx import Document
 
@@ -398,7 +418,8 @@ if __name__ == "__main__":
     for fn in (test_pipeline_end_to_end, test_guardrail_downgrades_met_without_evidence,
                test_agent_loop_recovers_from_bad_tool_call, test_agent_runs_same_turn_tool_calls_in_parallel,
                test_draft_streams_and_falls_back, test_bid_manager_answer_requalifies_and_drafts,
-               test_prompts_use_plain_words_and_verified_hijri_deadline, test_section_titles_are_clean_in_draft_and_docx,
+               test_prompts_use_plain_words_and_verified_hijri_deadline, test_test_tenders_folder_is_never_loaded,
+               test_section_titles_are_clean_in_draft_and_docx,
                test_run_budget_limits_live_runs,
                test_upload_pack_single_tender_flow, test_real_style_pack_long_pdf_hijri):
         with tempfile.TemporaryDirectory() as d:
