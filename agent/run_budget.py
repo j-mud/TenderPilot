@@ -15,7 +15,7 @@ _LOCK = threading.Lock()  # every session of a Streamlit app runs in the same pr
 
 
 class RunBudget:
-    def __init__(self, path: Path, max_per_day: int = 10, cooldown_s: int = 120, max_run_s: int = 600):
+    def __init__(self, path: Path, max_per_day: int = 30, cooldown_s: int = 120, max_run_s: int = 600):
         self.path = path
         self.max_per_day = max_per_day
         self.cooldown_s = cooldown_s

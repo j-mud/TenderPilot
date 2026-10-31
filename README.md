@@ -59,7 +59,7 @@ requirement recall and traps caught.
 **[TenderPilot on Streamlit Community Cloud](https://tenderpilot-demo.streamlit.app/)**
 
 The public app opens on a saved run of the fictional sample data. Visitors can switch off **Load backup run** to
-start a live run; live runs are limited to 10 per day, one at a time, at most one every 2 minutes.
+start a live run; live runs are limited to 30 per day, one at a time, at most one every 2 minutes.
 
 To try **Upload a tender** with documents the agent has never seen, use the four fictional tenders in
 [test_tenders/](test_tenders/README.md) (two in Arabic; U3 is split over two files). The expected results are in

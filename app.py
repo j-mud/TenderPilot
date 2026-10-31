@@ -50,7 +50,7 @@ DEPLOYED = bool(secret("APP_PASSWORD")) or Path("/mount/src").exists()
 DATA_SETS = sorted(p.name for p in (ROOT / "data").iterdir()
                    if (p / "company").is_dir() and not (DEPLOYED and p.name == "my_company"))
 # Deployed: cap live runs so a shared link can't run up the API bill (state in output/, not committed)
-BUDGET = RunBudget(ROOT / "output" / "run_budget.json", max_per_day=int(secret("MAX_RUNS_PER_DAY") or 10),
+BUDGET = RunBudget(ROOT / "output" / "run_budget.json", max_per_day=int(secret("MAX_RUNS_PER_DAY") or 30),
                    cooldown_s=120) if DEPLOYED else None
 # "Upload a tender": files go to output/uploads/<session>/ (git-ignored), checked against a chosen company
 UPLOAD = "Upload a tender"

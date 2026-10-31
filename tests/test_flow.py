@@ -292,7 +292,7 @@ def test_app_password_gate_and_deployed_defaults():
     budget_file = ROOT / "output" / "run_budget.json"
     saved = budget_file.read_text() if budget_file.exists() else None
     today = time.strftime("%Y-%m-%d", time.gmtime())
-    budget_file.write_text(json.dumps({"day": today, "runs": 10, "last_start": 0, "running_since": 0}))
+    budget_file.write_text(json.dumps({"day": today, "runs": 10_000, "last_start": 0, "running_since": 0}))
     try:
         app.toggle[0].set_value(False).run()
         next(b for b in app.button if "Run TenderPilot" in b.label).click().run()
